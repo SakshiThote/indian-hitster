@@ -71,16 +71,42 @@
       cursor: pointer;
     }
 
-    /* Player Container */
+    /* Secret Player Mask: Crops out song details, showing ONLY the play button */
     .player-container {
       width: 100%;
-      height: 152px;
+      height: 80px;
       border-radius: 12px;
       overflow: hidden;
       margin-bottom: 15px;
       background-color: #000000;
+      position: relative;
     }
-    iframe { width: 100%; height: 100%; border: 0; }
+    
+    .player-container iframe {
+      width: 100%;
+      height: 152px;
+      border: 0;
+      position: absolute;
+      top: -72px; /* Pulls top details out of view */
+      left: 0;
+    }
+
+    /* Black mask to cover any leftover metadata text */
+    .player-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 70%;
+      height: 100%;
+      background-color: #000000;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1db954;
+      font-size: 13px;
+      font-weight: bold;
+    }
 
     .btn-action {
       width: 100%;
@@ -113,7 +139,7 @@
   <div class="card">
     <div class="score-board">🪙 Hitster Coins: <span id="coinCount">0</span></div>
     
-    <!-- Intelligent Card Selector -->
+    <!-- Manual Card Selector -->
     <div class="input-group">
       <input type="number" id="manualCardInput" placeholder="Enter Card # (1-250)" min="1" max="250">
       <button class="btn-select" onclick="loadManualCard()">Go</button>
@@ -125,6 +151,7 @@
 
     <div class="player-container">
       <iframe id="spotifyPlayer" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <div class="player-mask">🔒 Secret Track</div>
     </div>
 
     <button class="btn-action btn-reveal" onclick="revealAnswer()">👁 Reveal Song, Artist & Year</button>
@@ -141,9 +168,9 @@
     let coins = 0;
 
     const songs = {
-      1: { title: "Mere Sapno Ki Rani", artist: "Kishore Kumar", year: "1969", spotifyId: "098jYib9xwJFe6W4eIL5Ok" },
-      2: { title: "Pyaar Deewana Hota Hai", artist: "Kishore Kumar", year: "1971", spotifyId: "6pA3Vq0R4fA3x6L2p1D1A2" },
-      3: { title: "Dum Maro Dum", artist: "Asha Bhosle", year: "1971", spotifyId: "0L3R5W8X9Y7Z6A5B4C3D2E" }
+      1: { title: "Mere Sapno Ki Rani", artist: "Kishore Kumar", year: "1969", spotifyId: "6lanRgr6wXibZr8KgzXxBl" },
+      2: { title: "Pyaar Deewana Hota Hai", artist: "Kishore Kumar", year: "1971", spotifyId: "0v020S6A1vU9jS6K2mN1b8" },
+      3: { title: "Dum Maro Dum", artist: "Asha Bhosle", year: "1971", spotifyId: "5n4U9MzOchgcyouhWWWsgD" }
     };
 
     function loadCard(id) {
@@ -152,7 +179,6 @@
       document.getElementById("spotifyPlayer").src = "https://open.spotify.com/embed/track/" + currentSong.spotifyId + "?utm_source=generator&theme=0";
       document.getElementById("answerBox").style.display = "none";
       
-      // Update UI fields
       document.getElementById("songTitle").innerText = currentSong.title;
       document.getElementById("artistName").innerText = "Artist: " + currentSong.artist;
       document.getElementById("releaseYear").innerText = currentSong.year;
@@ -176,7 +202,6 @@
       document.getElementById("coinCount").innerText = coins;
     }
 
-    // Initialize on page load using URL parameter or default to 1
     const urlParams = new URLSearchParams(window.location.search);
     const initialCardId = parseInt(urlParams.get('id')) || 1;
     loadCard(initialCardId);

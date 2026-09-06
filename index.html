@@ -178,6 +178,7 @@
       border-radius: 25px;
       cursor: pointer;
     }
+    .btn-stop { background-color: #e74c3c; color: #ffffff; }
     .btn-reveal { background-color: #1db954; color: #ffffff; }
     .btn-coin { background-color: #f1c40f; color: #000000; }
 
@@ -229,6 +230,7 @@
       <div class="time-out-overlay" id="timeOutOverlay">🛑 Time's Up! Make your guess.</div>
     </div>
 
+    <button class="btn-action btn-stop" onclick="stopAudio()">⏹ Stop Audio</button>
     <button class="btn-action btn-reveal" onclick="revealAnswer()">👁 Reveal Song, Artist & Year</button>
 
     <div id="answerBox" class="answer-box">
@@ -245,58 +247,58 @@
     let timeLeft = 30;
     let html5QrcodeScanner = null;
 
-  const songs = {
-  "1": { "title": "Rehnaa Hai Tere Dil Mein", "artist": "Sonu Nigam;Kavita Krishnamurthy", "year": "2001", "spotifyId": "6sqSKTgbJv4AwWsoonUGe4" },
-  "2": { "title": "Tu Tu Hai Wahi - Remix", "artist": "Vaishali", "year": "2013", "spotifyId": "2uD3RXappAgVMPbeLkq9jh" },
-  "3": { "title": "Aa Hi Jaiye", "artist": "Anuradha Sriram", "year": "2021", "spotifyId": "4VciVafjuHsgwCmRh8jlnd" },
-  "4": { "title": "Maine Jisko Chaaha", "artist": "Alisha Chinai;Sonu Nigam;Anu Malik;Sameer Anjaan", "year": "2004", "spotifyId": "0u0ZyEeSzysKO4oJgpit3U" },
-  "5": { "title": "Suraj Hua Maddham", "artist": "Sonu Nigam;Alka Yagnik", "year": "2001", "spotifyId": "651qE3T8sS0T56R8lVfX6t" },
-  "6": { "title": "In Dinon", "artist": "Pritam;Atif Aslam", "year": "2007", "spotifyId": "4pI31sUv899eJ2fXU3O8O4" },
-  "7": { "title": "Kal Ho Naa Ho", "artist": "Sonu Nigam", "year": "2003", "spotifyId": "7814x6qYgO1W13nQO2Z1a1" },
-  "8": { "title": "Soniyo", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2009", "spotifyId": "5c9ZJ58vK2X4r4Y94JpM2B" },
-  "9": { "title": "Main Agar Kahoon", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2007", "spotifyId": "6mJ83kZ51n5mXz44x6pI1a" },
-  "10": { "title": "Kabhie Khushi Kabhie Gham", "artist": "Lata Mangeshkar", "year": "2001", "spotifyId": "1a8X1u3yXpXp35y84xL4K4" },
-  "11": { "title": "Shukran Allah", "artist": "Sonu Nigam;Shreya Ghoshal;Salim Merchant", "year": "2009", "spotifyId": "34ZkLp8924x4X1a7yYp5O5" },
-  "12": { "title": "Deewana Tera", "artist": "Sonu Nigam", "year": "1999", "spotifyId": "291kXm1y284x5Z42mXp5L6" },
-  "13": { "title": "Abhi Mujh Mein Kahin", "artist": "Sonu Nigam", "year": "2012", "spotifyId": "0xZ1pLp48xY52kL45XmP2A" },
-  "14": { "title": "Tumhi Dekho Na", "artist": "Sonu Nigam;Alka Yagnik", "year": "2006", "spotifyId": "581pLp48xY52kL45XmP2B1" },
-  "15": { "title": "Do Pal", "artist": "Lata Mangeshkar;Sonu Nigam", "year": "2004", "spotifyId": "191pLp48xY52kL45XmP2C2" },
-  "16": { "title": "Jane Nahin Denge Tujhe", "artist": "Sonu Nigam", "year": "2009", "spotifyId": "291pLp48xY52kL45XmP2D3" },
-  "17": { "title": "Piyu Bole", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2005", "spotifyId": "391pLp48xY52kL45XmP2E4" },
-  "18": { "title": "Saathiya", "artist": "Sonu Nigam", "year": "2002", "spotifyId": "491pLp48xY52kL45XmP2F5" },
-  "19": { "title": "Tanhayee", "artist": "Sonu Nigam", "year": "2001", "spotifyId": "591pLp48xY52kL45XmP2G6" },
-  "20": { "title": "Mere Haath Mein", "artist": "Sonu Nigam;Sunidhi Chauhan", "year": "2006", "spotifyId": "691pLp48xY52kL45XmP2H7" },
-  "21": { "title": "Chup Chup Ke", "artist": "Sonu Nigam;Mahalakshmi Iyer", "year": "2005", "spotifyId": "791pLp48xY52kL45XmP2I8" },
-  "22": { "title": "Bole Chudiyan", "artist": "Kavita Krishnamurthy;Alka Yagnik;Sonu Nigam;Udit Narayan;Amit Kumar", "year": "2001", "spotifyId": "891pLp48xY52kL45XmP2J9" },
-  "23": { "title": "You Are My Soniya", "artist": "Sonu Nigam;Alka Yagnik", "year": "2001", "spotifyId": "991pLp48xY52kL45XmP2K0" },
-  "24": { "title": "Aa Jao Meri Tamanna", "artist": "Javed Ali;Jojo", "year": "2009", "spotifyId": "101pLp48xY52kL45XmP2L1" },
-  "25": { "title": "Dil Dooba", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2004", "spotifyId": "111pLp48xY52kL45XmP2M2" },
-  "26": { "title": "Falok Tak", "artist": "Udit Narayan;Mahalakshmi Iyer", "year": "2008", "spotifyId": "121pLp48xY52kL45XmP2N3" },
-  "27": { "title": "Kuchh Kasme", "artist": "Sonu Nigam;Alka Yagnik", "year": "2002", "spotifyId": "131pLp48xY52kL45XmP2O4" },
-  "28": { "title": "Aye Udi Udi", "artist": "Shaan", "year": "2002", "spotifyId": "141pLp48xY52kL45XmP2P5" },
-  "29": { "title": "Aisa Deewana", "artist": "Sonu Nigam;Alka Yagnik", "year": "2002", "spotifyId": "151pLp48xY52kL45XmP2Q6" },
-  "30": { "title": "Sathiya Ye Tune Kya Kiya", "artist": "S. P. Balasubrahmanyam;K. S. Chithra", "year": "1991", "spotifyId": "161pLp48xY52kL45XmP2R7" },
-  "31": { "title": "Dheere Dheere Se Meri Zindagi Mein Aana", "artist": "Kumar Sanu;Anuradha Paudwal", "year": "1990", "spotifyId": "171pLp48xY52kL45XmP2S8" },
-  "32": { "title": "Tujhe Dekha To", "artist": "Lata Mangeshkar;Kumar Sanu", "year": "1995", "spotifyId": "181pLp48xY52kL45XmP2T9" },
-  "33": { "title": "Pehla Nasha", "artist": "Udit Narayan;Sadhana Sargam", "year": "1992", "spotifyId": "191pLp48xY52kL45XmP2U0" },
-  "34": { "title": "Bahut Pyar Karte Hai", "artist": "Anuradha Paudwal", "year": "1991", "spotifyId": "201pLp48xY52kL45XmP2V1" },
-  "35": { "title": "Mera Dil Bhi Kitna Pagal Hai", "artist": "Kumar Sanu;Alka Yagnik", "year": "1991", "spotifyId": "211pLp48xY52kL45XmP2W2" },
-  "36": { "title": "Chura Ke Dil Mera", "artist": "Kumar Sanu;Alka Yagnik", "year": "1994", "spotifyId": "221pLp48xY52kL45XmP2X3" },
-  "37": { "title": "Tip Tip Barsa Pani", "artist": "Udit Narayan;Alka Yagnik", "year": "1994", "spotifyId": "231pLp48xY52kL45XmP2Y4" },
-  "38": { "title": "Aankhey Milate Darr Lagta Hai", "artist": "Udit Narayan;Alka Yagnik", "year": "1995", "spotifyId": "241pLp48xY52kL45XmP2Z5" },
-  "39": { "title": "Jeeta Tha Jiske Liye", "artist": "Kumar Sanu;Alka Yagnik;Ajay Devgn", "year": "1994", "spotifyId": "251pLp48xY52kL45XmP3A6" },
-  "40": { "title": "Pardesi Pardesi", "artist": "Udit Narayan;Alka Yagnik;Sapna Awasthi", "year": "1996", "spotifyId": "261pLp48xY52kL45XmP3B7" },
-  "41": { "title": "Tere Naam", "artist": "Udit Narayan;Alka Yagnik", "year": "2003", "spotifyId": "271pLp48xY52kL45XmP3C8" },
-  "42": { "title": "O Oh Jaane Jaana", "artist": "Kamaal Khan", "year": "1998", "spotifyId": "281pLp48xY52kL45XmP3D9" },
-  "43": { "title": "Chaiyya Chaiyya", "artist": "Sukhwinder Singh;Sapna Awasthi", "year": "1998", "spotifyId": "291pLp48xY52kL45XmP3E0" },
-  "44": { "title": "Taal Se Taal", "artist": "Alka Yagnik;Udit Narayan", "year": "1999", "spotifyId": "301pLp48xY52kL45XmP3F1" },
-  "45": { "title": "Chand Chupa Badal Mein", "artist": "Udit Narayan;Alka Yagnik", "year": "1999", "spotifyId": "311pLp48xY52kL45XmP3G2" },
-  "46": { "title": "Humko Humise Chura Lo", "artist": "Lata Mangeshkar;Udit Narayan", "year": "2000", "spotifyId": "321pLp48xY52kL45XmP3H3" },
-  "47": { "title": "Aankhein Khuli", "artist": "Lata Mangeshkar;Udit Narayan;Udhbhav;Manohar Shetty;Ishan;Shweta Pandit;Sonali Bhatawdekar;Pritha Mazumdar", "year": "2000", "spotifyId": "331pLp48xY52kL45XmP3I4" },
-  "48": { "title": "Kaho Naa Pyaar Hai", "artist": "Udit Narayan;Alka Yagnik", "year": "2000", "spotifyId": "341pLp48xY52kL45XmP3J5" },
-  "49": { "title": "Ek Pal Ka Jeena", "artist": "Lucky Ali", "year": "2000", "spotifyId": "351pLp48xY52kL45XmP3K6" },
-  "50": { "title": "Dil Ne Yeh Kaha Hai Dil Se", "artist": "Udit Narayan;Alka Yagnik;Kumar Sanu", "year": "2000", "spotifyId": "361pLp48xY52kL45XmP3L7" }
-};
+    const songs = {
+      "1": { "title": "Rehnaa Hai Tere Dil Mein", "artist": "Sonu Nigam;Kavita Krishnamurthy", "year": "2001", "spotifyId": "6sqSKTgbJv4AwWsoonUGe4" },
+      "2": { "title": "Tu Tu Hai Wahi - Remix", "artist": "Vaishali", "year": "2013", "spotifyId": "2uD3RXappAgVMPbeLkq9jh" },
+      "3": { "title": "Aa Hi Jaiye", "artist": "Anuradha Sriram", "year": "2021", "spotifyId": "4VciVafjuHsgwCmRh8jlnd" },
+      "4": { "title": "Maine Jisko Chaaha", "artist": "Alisha Chinai;Sonu Nigam;Anu Malik;Sameer Anjaan", "year": "2004", "spotifyId": "0u0ZyEeSzysKO4oJgpit3U" },
+      "5": { "title": "Suraj Hua Maddham", "artist": "Sonu Nigam;Alka Yagnik", "year": "2001", "spotifyId": "651qE3T8sS0T56R8lVfX6t" },
+      "6": { "title": "In Dinon", "artist": "Pritam;Atif Aslam", "year": "2007", "spotifyId": "4pI31sUv899eJ2fXU3O8O4" },
+      "7": { "title": "Kal Ho Naa Ho", "artist": "Sonu Nigam", "year": "2003", "spotifyId": "7814x6qYgO1W13nQO2Z1a1" },
+      "8": { "title": "Soniyo", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2009", "spotifyId": "5c9ZJ58vK2X4r4Y94JpM2B" },
+      "9": { "title": "Main Agar Kahoon", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2007", "spotifyId": "6mJ83kZ51n5mXz44x6pI1a" },
+      "10": { "title": "Kabhie Khushi Kabhie Gham", "artist": "Lata Mangeshkar", "year": "2001", "spotifyId": "1a8X1u3yXpXp35y84xL4K4" },
+      "11": { "title": "Shukran Allah", "artist": "Sonu Nigam;Shreya Ghoshal;Salim Merchant", "year": "2009", "spotifyId": "34ZkLp8924x4X1a7yYp5O5" },
+      "12": { "title": "Deewana Tera", "artist": "Sonu Nigam", "year": "1999", "spotifyId": "291kXm1y284x5Z42mXp5L6" },
+      "13": { "title": "Abhi Mujh Mein Kahin", "artist": "Sonu Nigam", "year": "2012", "spotifyId": "0xZ1pLp48xY52kL45XmP2A" },
+      "14": { "title": "Tumhi Dekho Na", "artist": "Sonu Nigam;Alka Yagnik", "year": "2006", "spotifyId": "581pLp48xY52kL45XmP2B1" },
+      "15": { "title": "Do Pal", "artist": "Lata Mangeshkar;Sonu Nigam", "year": "2004", "spotifyId": "191pLp48xY52kL45XmP2C2" },
+      "16": { "title": "Jane Nahin Denge Tujhe", "artist": "Sonu Nigam", "year": "2009", "spotifyId": "291pLp48xY52kL45XmP2D3" },
+      "17": { "title": "Piyu Bole", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2005", "spotifyId": "391pLp48xY52kL45XmP2E4" },
+      "18": { "title": "Saathiya", "artist": "Sonu Nigam", "year": "2002", "spotifyId": "491pLp48xY52kL45XmP2F5" },
+      "19": { "title": "Tanhayee", "artist": "Sonu Nigam", "year": "2001", "spotifyId": "591pLp48xY52kL45XmP2G6" },
+      "20": { "title": "Mere Haath Mein", "artist": "Sonu Nigam;Sunidhi Chauhan", "year": "2006", "spotifyId": "691pLp48xY52kL45XmP2H7" },
+      "21": { "title": "Chup Chup Ke", "artist": "Sonu Nigam;Mahalakshmi Iyer", "year": "2005", "spotifyId": "791pLp48xY52kL45XmP2I8" },
+      "22": { "title": "Bole Chudiyan", "artist": "Kavita Krishnamurthy;Alka Yagnik;Sonu Nigam;Udit Narayan;Amit Kumar", "year": "2001", "spotifyId": "891pLp48xY52kL45XmP2J9" },
+      "23": { "title": "You Are My Soniya", "artist": "Sonu Nigam;Alka Yagnik", "year": "2001", "spotifyId": "991pLp48xY52kL45XmP2K0" },
+      "24": { "title": "Aa Jao Meri Tamanna", "artist": "Javed Ali;Jojo", "year": "2009", "spotifyId": "101pLp48xY52kL45XmP2L1" },
+      "25": { "title": "Dil Dooba", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2004", "spotifyId": "111pLp48xY52kL45XmP2M2" },
+      "26": { "title": "Falok Tak", "artist": "Udit Narayan;Mahalakshmi Iyer", "year": "2008", "spotifyId": "121pLp48xY52kL45XmP2N3" },
+      "27": { "title": "Kuchh Kasme", "artist": "Sonu Nigam;Alka Yagnik", "year": "2002", "spotifyId": "131pLp48xY52kL45XmP2O4" },
+      "28": { "title": "Aye Udi Udi", "artist": "Shaan", "year": "2002", "spotifyId": "141pLp48xY52kL45XmP2P5" },
+      "29": { "title": "Aisa Deewana", "artist": "Sonu Nigam;Alka Yagnik", "year": "2002", "spotifyId": "151pLp48xY52kL45XmP2Q6" },
+      "30": { "title": "Sathiya Ye Tune Kya Kiya", "artist": "S. P. Balasubrahmanyam;K. S. Chithra", "year": "1991", "spotifyId": "161pLp48xY52kL45XmP2R7" },
+      "31": { "title": "Dheere Dheere Se Meri Zindagi Mein Aana", "artist": "Kumar Sanu;Anuradha Paudwal", "year": "1990", "spotifyId": "171pLp48xY52kL45XmP2S8" },
+      "32": { "title": "Tujhe Dekha To", "artist": "Lata Mangeshkar;Kumar Sanu", "year": "1995", "spotifyId": "181pLp48xY52kL45XmP2T9" },
+      "33": { "title": "Pehla Nasha", "artist": "Udit Narayan;Sadhana Sargam", "year": "1992", "spotifyId": "191pLp48xY52kL45XmP2U0" },
+      "34": { "title": "Bahut Pyar Karte Hai", "artist": "Anuradha Paudwal", "year": "1991", "spotifyId": "201pLp48xY52kL45XmP2V1" },
+      "35": { "title": "Mera Dil Bhi Kitna Pagal Hai", "artist": "Kumar Sanu;Alka Yagnik", "year": "1991", "spotifyId": "211pLp48xY52kL45XmP2W2" },
+      "36": { "title": "Chura Ke Dil Mera", "artist": "Kumar Sanu;Alka Yagnik", "year": "1994", "spotifyId": "221pLp48xY52kL45XmP2X3" },
+      "37": { "title": "Tip Tip Barsa Pani", "artist": "Udit Narayan;Alka Yagnik", "year": "1994", "spotifyId": "231pLp48xY52kL45XmP2Y4" },
+      "38": { "title": "Aankhey Milate Darr Lagta Hai", "artist": "Udit Narayan;Alka Yagnik", "year": "1995", "spotifyId": "241pLp48xY52kL45XmP2Z5" },
+      "39": { "title": "Jeeta Tha Jiske Liye", "artist": "Kumar Sanu;Alka Yagnik;Ajay Devgn", "year": "1994", "spotifyId": "251pLp48xY52kL45XmP3A6" },
+      "40": { "title": "Pardesi Pardesi", "artist": "Udit Narayan;Alka Yagnik;Sapna Awasthi", "year": "1996", "spotifyId": "261pLp48xY52kL45XmP3B7" },
+      "41": { "title": "Tere Naam", "artist": "Udit Narayan;Alka Yagnik", "year": "2003", "spotifyId": "271pLp48xY52kL45XmP3C8" },
+      "42": { "title": "O Oh Jaane Jaana", "artist": "Kamaal Khan", "year": "1998", "spotifyId": "281pLp48xY52kL45XmP3D9" },
+      "43": { "title": "Chaiyya Chaiyya", "artist": "Sukhwinder Singh;Sapna Awasthi", "year": "1998", "spotifyId": "291pLp48xY52kL45XmP3E0" },
+      "44": { "title": "Taal Se Taal", "artist": "Alka Yagnik;Udit Narayan", "year": "1999", "spotifyId": "301pLp48xY52kL45XmP3F1" },
+      "45": { "title": "Chand Chupa Badal Mein", "artist": "Udit Narayan;Alka Yagnik", "year": "1999", "spotifyId": "311pLp48xY52kL45XmP3G2" },
+      "46": { "title": "Humko Humise Chura Lo", "artist": "Lata Mangeshkar;Udit Narayan", "year": "2000", "spotifyId": "321pLp48xY52kL45XmP3H3" },
+      "47": { "title": "Aankhein Khuli", "artist": "Lata Mangeshkar;Udit Narayan;Udhbhav;Manohar Shetty;Ishan;Shweta Pandit;Sonali Bhatawdekar;Pritha Mazumdar", "year": "2000", "spotifyId": "331pLp48xY52kL45XmP3I4" },
+      "48": { "title": "Kaho Naa Pyaar Hai", "artist": "Udit Narayan;Alka Yagnik", "year": "2000", "spotifyId": "341pLp48xY52kL45XmP3J5" },
+      "49": { "title": "Ek Pal Ka Jeena", "artist": "Lucky Ali", "year": "2000", "spotifyId": "351pLp48xY52kL45XmP3K6" },
+      "50": { "title": "Dil Ne Yeh Kaha Hai Dil Se", "artist": "Udit Narayan;Alka Yagnik;Kumar Sanu", "year": "2000", "spotifyId": "361pLp48xY52kL45XmP3L7" }
+    };
 
     function startScanner() {
       const container = document.getElementById("qr-reader-container");
@@ -305,7 +307,6 @@
       if (!html5QrcodeScanner) {
         html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 200 });
         html5QrcodeScanner.render((decodedText) => {
-          // Extract card number from URL parameter or raw ID text
           const matchedId = decodedText.match(/id=(\d+)/) || decodedText.match(/^(\d+)$/);
           if (matchedId && songs[matchedId[1]]) {
             loadCard(parseInt(matchedId[1]));
@@ -332,8 +333,15 @@
           clearInterval(timerInterval);
           document.getElementById("timerText").innerText = "⏱ Time's Up!";
           document.getElementById("timeOutOverlay").style.display = "flex";
+          document.getElementById("spotifyPlayer").src = ""; // Silences Spotify instantly on time out
         }
       }, 1000);
+    }
+
+    function stopAudio() {
+      clearInterval(timerInterval);
+      document.getElementById("spotifyPlayer").src = ""; // Clears player source to stop sound manually
+      document.getElementById("timerText").innerText = "⏱ Audio Stopped";
     }
 
     function loadCard(id) {

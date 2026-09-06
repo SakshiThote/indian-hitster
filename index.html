@@ -45,7 +45,6 @@
     h1 { color: #ffffff; font-size: 22px; margin: 5px 0; }
     p { color: #b3b3b3; font-size: 13px; margin-bottom: 15px; }
 
-    /* Manual Input Section */
     .input-group {
       display: flex;
       gap: 8px;
@@ -71,6 +70,13 @@
       cursor: pointer;
     }
 
+    .timer-display {
+      font-size: 14px;
+      font-weight: bold;
+      color: #f1c40f;
+      margin-bottom: 8px;
+    }
+
     /* Player Container */
     .player-container {
       width: 100%;
@@ -91,7 +97,7 @@
       left: 0;
     }
 
-    /* Mask covering metadata text completely while leaving play button accessible */
+    /* Secret Track Mask */
     .player-mask {
       position: absolute;
       top: 0;
@@ -107,6 +113,38 @@
       font-size: 13px;
       font-weight: bold;
       z-index: 10;
+    }
+
+    /* Overlays */
+    .start-overlay, .time-out-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #1e1e1e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .start-overlay button {
+      background-color: #1db954;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .time-out-overlay {
+      display: none;
+      background-color: #121212;
+      color: #e74c3c;
+      font-weight: bold;
+      font-size: 15px;
     }
 
     .btn-action {
@@ -149,9 +187,17 @@
     <h1>🎵 Indian Hitster</h1>
     <p>Listen to the track, guess the details, then reveal!</p>
 
+    <div class="timer-display" id="timerText">⏱ Time Remaining: 30s</div>
+
     <div class="player-container">
       <iframe id="spotifyPlayer" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
       <div class="player-mask">🔒 Secret Track</div>
+      
+      <div class="start-overlay" id="startOverlay">
+        <button onclick="startListening()">▶ Start 30s Clip</button>
+      </div>
+
+      <div class="time-out-overlay" id="timeOutOverlay">🛑 Time's Up! Make your guess.</div>
     </div>
 
     <button class="btn-action btn-reveal" onclick="revealAnswer()">👁 Reveal Song, Artist & Year</button>
@@ -166,20 +212,46 @@
 
   <script>
     let coins = 0;
+    let timerInterval = null;
+    let timeLeft = 30;
 
-    // Verified Spotify Track IDs
     const songs = {
       1: { title: "Mere Sapno Ki Rani", artist: "Kishore Kumar", year: "1969", spotifyId: "098jYib9xwJFe6W4eIL5Ok" },
       2: { title: "Pyaar Deewana Hota Hai", artist: "Kishore Kumar", year: "1971", spotifyId: "0Yu6DMaU2w0777Ek5XQNyI" },
       3: { title: "Dum Maro Dum", artist: "Asha Bhosle", year: "1971", spotifyId: "4u7jmbLddehSmDXzTugvnI" }
     };
 
+    function startListening() {
+      document.getElementById("startOverlay").style.display = "none";
+      
+      clearInterval(timerInterval);
+      timeLeft = 30;
+      document.getElementById("timerText").innerText = "⏱ Time Remaining: 30s";
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timerText").innerText = "⏱ Time Remaining: " + timeLeft + "s";
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("timerText").innerText = "⏱ Time's Up!";
+          document.getElementById("timeOutOverlay").style.display = "flex";
+        }
+      }, 1000);
+    }
+
     function loadCard(id) {
+      clearInterval(timerInterval);
       const currentSong = songs[id] || songs[1];
+      
       document.getElementById("cardDisplayId").innerText = "CARD " + String(id).padStart(3, '0');
       document.getElementById("spotifyPlayer").src = "https://open.spotify.com/embed/track/" + currentSong.spotifyId + "?utm_source=generator&theme=0";
-      document.getElementById("answerBox").style.display = "none";
       
+      document.getElementById("answerBox").style.display = "none";
+      document.getElementById("timeOutOverlay").style.display = "none";
+      document.getElementById("startOverlay").style.display = "flex";
+      document.getElementById("timerText").innerText = "⏱ Time Remaining: 30s";
+
       document.getElementById("songTitle").innerText = currentSong.title;
       document.getElementById("artistName").innerText = "Artist: " + currentSong.artist;
       document.getElementById("releaseYear").innerText = currentSong.year;
@@ -195,6 +267,7 @@
     }
 
     function revealAnswer() {
+      clearInterval(timerInterval);
       document.getElementById("answerBox").style.display = "block";
     }
 

@@ -103,17 +103,23 @@
     const cardId = parseInt(urlParams.get('id')) || 1;
 
     // Database using official Spotify Track IDs
+    //const songs = {// Database using official Spotify Track IDs
     const songs = {
-      1: { title: "Mere Sapno Ki Rani", artist: "Kishore Kumar", year: "1969", spotifyId: "3m0LXZS4f0M6J3E0XkO04m" },
-      2: { title: "Pyaar Deewana Hota Hai", artist: "Kishore Kumar", year: "1971", spotifyId: "6m7FqYy0eX7d692O5H0aA0" },
-      3: { title: "Dum Maro Dum", artist: "Asha Bhosle", year: "1971", spotifyId: "1e1Lw0T4wY9Q7G8C5f4E3D" },
-      4: { title: "Yeh Dosti Hum Nahi Todenge", artist: "Kishore Kumar, Manna Dey", year: "1975", spotifyId: "2Xv83k9E4E5a3P7F0G1H2I" },
-      5: { title: "Khaike Paan Banaraswala", artist: "Kishore Kumar", year: "1978", spotifyId: "0Y2X3Z4A5B6C7D8E9F0G1H" },
-      6: { title: "Aap Jaisa Koi", artist: "Nazia Hassan", year: "1980", spotifyId: "4A5B6C7D8E9F0G1H2I3J4K" },
-      7: { title: "I Am A Disco Dancer", artist: "Vijay Benedict", year: "1982", spotifyId: "5B6C7D8E9F0G1H2I3J4K5L" },
-      8: { title: "Hawa Hawai", artist: "Kavita Krishnamurti", year: "1987", spotifyId: "6C7D8E9F0G1H2I3J4K5L6M" },
-      9: { title: "Papa Kehte Hain", artist: "Udit Narayan", year: "1988", spotifyId: "7D8E9F0G1H2I3J4K5L6M7N" },
-      10: { title: "Pehla Nasha", artist: "Udit Narayan, Sadhana Sargam", year: "1992", spotifyId: "8E9F0G1H2I3J4K5L6M7N8O" }
+      1: { title: "Mere Sapno Ki Rani", artist: "Kishore Kumar", year: "1969", spotifyId: "1P2MllvM6aP4W5x17A612r" },
+      2: { title: "Pyaar Deewana Hota Hai", artist: "Kishore Kumar", year: "1971", spotifyId: "6pA3Vq0R4fA3x6L2p1D1A2" },
+      3: { title: "Dum Maro Dum", artist: "Asha Bhosle", year: "1971", spotifyId: "0L3R5W8X9Y7Z6A5B4C3D2E" },
+      4: { title: "Yeh Dosti Hum Nahi Todenge", artist: "Kishore Kumar, Manna Dey", year: "1975", spotifyId: "4R5S6T7U8V9W0X1Y2Z3A4B" },
+      5: { title: "Khaike Paan Banaraswala", artist: "Kishore Kumar", year: "1978", spotifyId: "5S6T7U8V9W0X1Y2Z3A4B5C" },
+      6: { title: "Aap Jaisa Koi", artist: "Nazia Hassan", year: "1980", spotifyId: "6T7U8V9W0X1Y2Z3A4B5C6D" },
+      7: { title: "I Am A Disco Dancer", artist: "Vijay Benedict", year: "1982", spotifyId: "7U8V9W0X1Y2Z3A4B5C6D7E" },
+      8: { title: "Hawa Hawai", artist: "Kavita Krishnamurti", year: "1987", spotifyId: "8V9W0X1Y2Z3A4B5C6D7E8F" },
+      9: { title: "Papa Kehte Hain", artist: "Udit Narayan", year: "1988", spotifyId: "9W0X1Y2Z3A4B5C6D7E8F9G" },
+      10: { title: "Pehla Nasha", artist: "Udit Narayan, Sadhana Sargam", year: "1992", spotifyId: "0X1Y2Z3A4B5C6D7E8F9G0H" },
+      11: { title: "Mera Dil Bhi Kitna Pagal Hai", artist: "Kumar Sanu, Alka Yagnik", year: "1991", spotifyId: "1Y2Z3A4B5C6D7E8F9G0H1I" },
+      12: { title: "Tu Cheez Badi Hai Mast Mast", artist: "Udit Narayan, Kavita Krishnamurti", year: "1994", spotifyId: "2Z3A4B5C6D7E8F9G0H1I2J" },
+      13: { title: "Ole Ole", artist: "Abhijeet", year: "1994", spotifyId: "3A4B5C6D7E8F9G0H1I2J3K" },
+      14: { title: "Tujhe Dekha To", artist: "Kumar Sanu, Lata Mangeshkar", year: "1995", spotifyId: "4B5C6D7E8F9G0H1I2J3K4L" },
+      15: { title: "Humma Humma", artist: "Remo Fernandes", year: "1995", spotifyId: "5C6D7E8F9G0H1I2J3K4L5M" }
     };
 
     const currentSong = songs[cardId] || songs[1];

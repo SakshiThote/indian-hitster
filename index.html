@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Indian Hitster</title>
+  <title>Indian Hitster - Secret Card</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -26,7 +26,13 @@
       width: 100%;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
-    h1 { color: #1db954; font-size: 24px; margin-bottom: 8px; }
+    .card-id {
+      color: #1db954;
+      font-weight: bold;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+    h1 { color: #ffffff; font-size: 24px; margin: 10px 0 8px; }
     p { color: #b3b3b3; font-size: 14px; margin-bottom: 24px; }
     .btn {
       width: 100%;
@@ -48,52 +54,293 @@
       display: none;
       border: 1px solid #1db954;
     }
-    .song-title { font-size: 18px; font-weight: bold; }
-    .movie-artist { font-size: 14px; color: #b3b3b3; margin-top: 4px; }
-    .release-year { font-size: 32px; font-weight: bold; color: #1db954; margin-top: 10px; }
+    .song-title { font-size: 20px; font-weight: bold; color: #ffffff; }
+    .artist-name { font-size: 15px; color: #b3b3b3; margin-top: 6px; }
+    .release-year { font-size: 36px; font-weight: bold; color: #1db954; margin-top: 12px; }
   </style>
 </head>
 <body>
 
   <div class="card">
+    <div class="card-id" id="cardDisplayId">CARD ---</div>
     <h1>🎵 Indian Hitster</h1>
-    <p>Listen carefully! Where does this land on your timeline?</p>
+    <p>Listen closely! Guess the song name, artist, and release year before revealing.</p>
 
     <audio id="audioPlayer">
       <source id="audioSource" src="" type="audio/mpeg">
     </audio>
 
-    <button class="btn btn-play" id="playBtn" onclick="toggleAudio()">▶ Play Audio</button>
-    <button class="btn btn-reveal" onclick="revealAnswer()">👁 Reveal Details</button>
+    <button class="btn btn-play" id="playBtn" onclick="toggleAudio()">▶ Play Audio Snippet</button>
+    <button class="btn btn-reveal" onclick="revealAnswer()">👁 Reveal Song, Artist & Year</button>
 
     <div id="answerBox" class="answer-box">
       <div class="song-title" id="songTitle">---</div>
-      <div class="movie-artist" id="movieArtist">---</div>
+      <div class="artist-name" id="artistName">---</div>
       <div class="release-year" id="releaseYear">----</div>
     </div>
   </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const cardId = urlParams.get('id') || '1';
+    const cardId = parseInt(urlParams.get('id')) || 1;
 
-    // EDIT YOUR SONGS HERE IN STEP 5
+    // 250 SONGS FROM YOUR PRINTABLE PACK
     const songs = {
-      "1": {
-        title: "Chaiyya Chaiyya",
-        movie: "Dil Se",
-        year: "1998",
-        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      },
-      "2": {
-        title: "Kal Ho Naa Ho",
-        movie: "Kal Ho Naa Ho",
-        year: "2003",
-        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-      }
+      1: { title: "Mere Sapno Ki Rani", artist: "Kishore Kumar", year: "1969", audioUrl: "song1.mp3" },
+      2: { title: "Pyaar Deewana Hota Hai", artist: "Kishore Kumar", year: "1971", audioUrl: "song2.mp3" },
+      3: { title: "Dum Maro Dum", artist: "Asha Bhosle", year: "1971", audioUrl: "song3.mp3" },
+      4: { title: "Yeh Dosti", artist: "Kishore Kumar, Manna Dey", year: "1975", audioUrl: "song4.mp3" },
+      5: { title: "Khaike Paan Banaraswala", artist: "Kishore Kumar", year: "1978", audioUrl: "song5.mp3" },
+      6: { title: "Aap Jaisa Koi", artist: "Nazia Hassan", year: "1980", audioUrl: "song6.mp3" },
+      7: { title: "I Am A Disco Dancer", artist: "Vijay Benedict", year: "1982", audioUrl: "song7.mp3" },
+      8: { title: "Hawa Hawai", artist: "Kavita Krishnamurti", year: "1987", audioUrl: "song8.mp3" },
+      9: { title: "Papa Kehte Hain", artist: "Udit Narayan", year: "1988", audioUrl: "song9.mp3" },
+      10: { title: "Pehla Nasha", artist: "Udit Narayan, Sadhana Sargam", year: "1992", audioUrl: "song10.mp3" },
+      11: { title: "Mera Dil Bhi Kitna Pagal Hai", artist: "Kumar Sanu, Alka Yagnik", year: "1991", audioUrl: "song11.mp3" },
+      12: { title: "Tu Cheez Badi Hai Mast Mast", artist: "Udit Narayan, Kavita Krishnamurti", year: "1994", audioUrl: "song12.mp3" },
+      13: { title: "Ole Ole", artist: "Abhijeet", year: "1994", audioUrl: "song13.mp3" },
+      14: { title: "Tujhe Dekha To", artist: "Kumar Sanu, Lata Mangeshkar", year: "1995", audioUrl: "song14.mp3" },
+      15: { title: "Humma Humma", artist: "Remo Fernandes", year: "1995", audioUrl: "song15.mp3" },
+      16: { title: "Chaiyya Chaiyya", artist: "Sukhwinder Singh, Sapna Awasthi", year: "1998", audioUrl: "song16.mp3" },
+      17: { title: "Kuch Kuch Hota Hai", artist: "Udit Narayan, Alka Yagnik", year: "1998", audioUrl: "song17.mp3" },
+      18: { title: "Sona Sona", artist: "Sonu Nigam, Sanjay Dutt, Sudesh Bhosle", year: "1998", audioUrl: "song18.mp3" },
+      19: { title: "Aankhon Mein Base Ho Tum", artist: "Abhijeet, Kavita Krishnamurti", year: "1995", audioUrl: "song19.mp3" },
+      20: { title: "Tanhayee", artist: "Sonu Nigam", year: "2001", audioUrl: "song20.mp3" },
+      21: { title: "Mitwa", artist: "Shafqat Amanat Ali, Shankar Mahadevan, Caralisa Monteiro", year: "2006", audioUrl: "song21.mp3" },
+      22: { title: "Kajra Re", artist: "Alisha Chinai, Shankar Mahadevan, Javed Ali", year: "2005", audioUrl: "song22.mp3" },
+      23: { title: "Dus Bahane", artist: "Shaan, KK", year: "2005", audioUrl: "song23.mp3" },
+      24: { title: "Aankhon Mein Teri", artist: "KK", year: "2007", audioUrl: "song24.mp3" },
+      25: { title: "Tum Se Hi", artist: "Mohit Chauhan", year: "2007", audioUrl: "song25.mp3" },
+      26: { title: "Mauja Hi Mauja", artist: "Mika Singh", year: "2007", audioUrl: "song26.mp3" },
+      27: { title: "Pehli Nazar Mein", artist: "Atif Aslam", year: "2008", audioUrl: "song27.mp3" },
+      28: { title: "Zara Zara Touch Me", artist: "Monali Thakur", year: "2008", audioUrl: "song28.mp3" },
+      29: { title: "Masakali", artist: "Mohit Chauhan", year: "2009", audioUrl: "song29.mp3" },
+      30: { title: "All Izz Well", artist: "Sonu Nigam, Swanand Kirkire, Shaan", year: "2009", audioUrl: "song30.mp3" },
+      31: { title: "Tere Naina", artist: "Shafqat Amanat Ali", year: "2010", audioUrl: "song31.mp3" },
+      32: { title: "Pee Loon", artist: "Mohit Chauhan", year: "2010", audioUrl: "song32.mp3" },
+      33: { title: "I Hate Luv Storys", artist: "Vishal Dadlani", year: "2010", audioUrl: "song33.mp3" },
+      34: { title: "Senorita", artist: "Farhan Akhtar, Hrithik Roshan, Abhay Deol", year: "2011", audioUrl: "song34.mp3" },
+      35: { title: "Tum Ho", artist: "Mohit Chauhan, Suzanne D'Mello", year: "2011", audioUrl: "song35.mp3" },
+      36: { title: "Phir Se Ud Chala", artist: "Mohit Chauhan", year: "2011", audioUrl: "song36.mp3" },
+      37: { title: "Aashiyan", artist: "Shreya Ghoshal, Nikhil Paul George", year: "2012", audioUrl: "song37.mp3" },
+      38: { title: "Badtameez Dil", artist: "Benny Dayal", year: "2013", audioUrl: "song38.mp3" },
+      39: { title: "Kabira", artist: "Tochi Raina, Rekha Bhardwaj", year: "2013", audioUrl: "song39.mp3" },
+      40: { title: "Tum Hi Ho", artist: "Arijit Singh", year: "2013", audioUrl: "song40.mp3" },
+      41: { title: "Galliyan", artist: "Ankit Tiwari", year: "2014", audioUrl: "song41.mp3" },
+      42: { title: "Samjhawan", artist: "Arijit Singh, Shreya Ghoshal", year: "2014", audioUrl: "song42.mp3" },
+      43: { title: "London Thumakda", artist: "Labh Janjua, Sonu Kakkar, Neha Kakkar", year: "2014", audioUrl: "song43.mp3" },
+      44: { title: "Gerua", artist: "Arijit Singh, Antara Mitra", year: "2015", audioUrl: "song44.mp3" },
+      45: { title: "Agar Tum Saath Ho", artist: "Alka Yagnik, Arijit Singh", year: "2015", audioUrl: "song45.mp3" },
+      46: { title: "Kar Gayi Chull", artist: "Badshah, Fazilpuria, Sukriti Kakar, Neha Kakkar", year: "2016", audioUrl: "song46.mp3" },
+      47: { title: "Nashe Si Chadh Gayi", artist: "Arijit Singh", year: "2016", audioUrl: "song47.mp3" },
+      48: { title: "Hawayein", artist: "Arijit Singh", year: "2017", audioUrl: "song48.mp3" },
+      49: { title: "Dil Diyan Gallan", artist: "Atif Aslam", year: "2017", audioUrl: "song49.mp3" },
+      50: { title: "Apna Time Aayega", artist: "Ranveer Singh", year: "2019", audioUrl: "song50.mp3" },
+      51: { title: "Ghungroo", artist: "Arijit Singh, Shilpa Rao", year: "2019", audioUrl: "song51.mp3" },
+      52: { title: "Shayad", artist: "Arijit Singh", year: "2020", audioUrl: "song52.mp3" },
+      53: { title: "Ranjha", artist: "B Praak, Jasleen Royal", year: "2021", audioUrl: "song53.mp3" },
+      54: { title: "Kesariya", artist: "Arijit Singh", year: "2022", audioUrl: "song54.mp3" },
+      55: { title: "What Jhumka?", artist: "Arijit Singh, Jonita Gandhi", year: "2023", audioUrl: "song55.mp3" },
+      56: { title: "Satranga", artist: "Arijit Singh", year: "2023", audioUrl: "song56.mp3" },
+      57: { title: "Heeriye", artist: "Jasleen Royal, Arijit Singh", year: "2023", audioUrl: "song57.mp3" },
+      58: { title: "Tauba Tauba", artist: "Karan Aujla", year: "2024", audioUrl: "song58.mp3" },
+      59: { title: "Aaj Ki Raat", artist: "Madhubanti Bagchi, Divya Kumar, Sachin-Jigar", year: "2024", audioUrl: "song59.mp3" },
+      60: { title: "Aayi Nai", artist: "Pawan Singh, Simran Choudhary, Divya Kumar", year: "2024", audioUrl: "song60.mp3" },
+      61: { title: "Teri Baaton Mein Aisa Uljha Jiya", artist: "Raghav, Tanishk Bagchi, Asees Kaur", year: "2024", audioUrl: "song61.mp3" },
+      62: { title: "Aaj Ki Raat (Don 2006)", artist: "Alisha Chinai, Mahalakshmi lyer, Sonu Nigam", year: "2006", audioUrl: "song62.mp3" },
+      63: { title: "Beedi", artist: "Sukhwinder Singh, Sunidhi Chauhan, Clinton Cerejo", year: "2006", audioUrl: "song63.mp3" },
+      64: { title: "Rock On!!", artist: "Farhan Akhtar", year: "2008", audioUrl: "song64.mp3" },
+      65: { title: "Ik Junoon (Paint It Red)", artist: "Vishal Dadlani", year: "2011", audioUrl: "song65.mp3" },
+      66: { title: "Ilahi", artist: "Arijit Singh", year: "2013", audioUrl: "song66.mp3" },
+      67: { title: "Manjha", artist: "Vishal Dadlani", year: "2013", audioUrl: "song67.mp3" },
+      68: { title: "Patakha Guddi", artist: "Nooran Sisters", year: "2014", audioUrl: "song68.mp3" },
+      69: { title: "Shaam", artist: "Amit Trivedi, Neuman Pinto, Nikhil D'Souza", year: "2010", audioUrl: "song69.mp3" },
+      70: { title: "Iktara", artist: "Kavita Seth, Amit Trivedi", year: "2009", audioUrl: "song70.mp3" },
+      71: { title: "Kahaani", artist: "Amit Trivedi", year: "2012", audioUrl: "song71.mp3" },
+      72: { title: "Aao Milo Chalo", artist: "Shaan, Ustad Sultan Khan", year: "2007", audioUrl: "song72.mp3" },
+      73: { title: "Jaane Kyun", artist: "Vishal Dadlani", year: "2008", audioUrl: "song73.mp3" },
+      74: { title: "Uff Teri Adaa", artist: "Shankar Mahadevan, Alyssa Mendonsa", year: "2010", audioUrl: "song74.mp3" },
+      75: { title: "Khaabon Ke Parinday", artist: "Mohit Chauhan, Alyssa Mendonsa", year: "2011", audioUrl: "song75.mp3" },
+      76: { title: "Daaru Desi", artist: "Benny Dayal, Shalmali Kholgade", year: "2012", audioUrl: "song76.mp3" },
+      77: { title: "Subhanallah", artist: "Sreeram, Shilpa Rao", year: "2013", audioUrl: "song77.mp3" },
+      78: { title: "Manmarziyan", artist: "Shilpa Rao", year: "2013", audioUrl: "song78.mp3" },
+      79: { title: "Afeemi", artist: "Sanah Moidutty, Jigar Saraiya", year: "2017", audioUrl: "song79.mp3" },
+      80: { title: "Nazm Nazm", artist: "Arko", year: "2017", audioUrl: "song80.mp3" },
+      81: { title: "Lae Dooba", artist: "Sunidhi Chauhan", year: "2018", audioUrl: "song81.mp3" },
+      82: { title: "Dilbar", artist: "Neha Kakkar, Dhvani Bhanushali, Ikka", year: "2018", audioUrl: "song82.mp3" },
+      83: { title: "Makhna", artist: "Yasser Desai, Asees Kaur", year: "2019", audioUrl: "song83.mp3" },
+      84: { title: "Doobey", artist: "Lothika", year: "2022", audioUrl: "song84.mp3" },
+      85: { title: "Phir Aur Kya Chahiye", artist: "Arijit Singh, Sachin-Jigar", year: "2023", audioUrl: "song85.mp3" },
+      86: { title: "Ve Kamleya", artist: "Arijit Singh, Shreya Ghoshal", year: "2023", audioUrl: "song86.mp3" },
+      87: { title: "O Sanam", artist: "Lucky Ali", year: "1996", audioUrl: "song87.mp3" },
+      88: { title: "Ek Pal Ka Jeena", artist: "Lucky Ali", year: "2001", audioUrl: "song88.mp3" },
+      89: { title: "Kabhi Aisa Lagta Hai", artist: "Lucky Ali", year: "2000", audioUrl: "song89.mp3" },
+      90: { title: "Kandisa", artist: "Indian Ocean", year: "2000", audioUrl: "song90.mp3" },
+      91: { title: "Bandeh", artist: "Indian Ocean", year: "2004", audioUrl: "song91.mp3" },
+      92: { title: "Ma Rewa", artist: "Indian Ocean", year: "1999", audioUrl: "song92.mp3" },
+      93: { title: "Aazaadi", artist: "Indian Ocean", year: "2000", audioUrl: "song93.mp3" },
+      94: { title: "Khoon Chala", artist: "Mohit Chauhan", year: "2006", audioUrl: "song94.mp3" },
+      95: { title: "Mann Kasturi Re", artist: "Indian Ocean", year: "2015", audioUrl: "song95.mp3" },
+      96: { title: "Bhor", artist: "Indian Ocean", year: "2014", audioUrl: "song96.mp3" },
+      97: { title: "Dil Beparvah", artist: "Ankur Tewari, Prateek Kuhad", year: "2017", audioUrl: "song97.mp3" },
+      98: { title: "cold/mess", artist: "Prateek Kuhad", year: "2016", audioUrl: "song98.mp3" },
+      99: { title: "Kasoor", artist: "Prateek Kuhad", year: "2017", audioUrl: "song99.mp3" },
+      100: { title: "Oh Love", artist: "Prateek Kuhad", year: "2015", audioUrl: "song100.mp3" },
+      101: { title: "Co2", artist: "Prateek Kuhad", year: "2018", audioUrl: "song101.mp3" },
+      102: { title: "Tune Kaha", artist: "Prateek Kuhad", year: "2013", audioUrl: "song102.mp3" },
+      103: { title: "Raat Raazi", artist: "Prateek Kuhad", year: "2013", audioUrl: "song103.mp3" },
+      104: { title: "Mulaqat", artist: "Prateek Kuhad", year: "2018", audioUrl: "song104.mp3" },
+      105: { title: "Kasoor (Acoustic)", artist: "Prateek Kuhad", year: "2017", audioUrl: "song105.mp3" },
+      106: { title: "Choo Lo", artist: "The Local Train", year: "2015", audioUrl: "song106.mp3" },
+      107: { title: "Aaoge Tum Kabhi", artist: "The Local Train", year: "2015", audioUrl: "song107.mp3" },
+      108: { title: "Dil Mere", artist: "The Local Train", year: "2018", audioUrl: "song108.mp3" },
+      109: { title: "Aaftaab", artist: "The Local Train", year: "2018", audioUrl: "song109.mp3" },
+      110: { title: "Khudi", artist: "The Local Train", year: "2018", audioUrl: "song110.mp3" },
+      111: { title: "Bandey", artist: "The Local Train", year: "2015", audioUrl: "song111.mp3" },
+      112: { title: "Khoj", artist: "When Chai Met Toast", year: "2018", audioUrl: "song112.mp3" },
+      113: { title: "Firefly", artist: "When Chai Met Toast", year: "2016", audioUrl: "song113.mp3" },
+      114: { title: "Joy of Little Things", artist: "When Chai Met Toast", year: "2016", audioUrl: "song114.mp3" },
+      115: { title: "When We Feel Young", artist: "When Chai Met Toast", year: "2020", audioUrl: "song115.mp3" },
+      116: { title: "Kahaani", artist: "When Chai Met Toast", year: "2020", audioUrl: "song116.mp3" },
+      117: { title: "Maybe I Can Fly", artist: "When Chai Met Toast", year: "2020", audioUrl: "song117.mp3" },
+      118: { title: "Nee Aara", artist: "When Chai Met Toast", year: "2019", audioUrl: "song118.mp3" },
+      119: { title: "Beautiful World", artist: "When Chai Met Toast", year: "2016", audioUrl: "song119.mp3" },
+      120: { title: "Udd Gaye", artist: "Ritviz", year: "2017", audioUrl: "song120.mp3" },
+      121: { title: "Liggi", artist: "Ritviz", year: "2019", audioUrl: "song121.mp3" },
+      122: { title: "Jeet", artist: "Ritviz", year: "2019", audioUrl: "song122.mp3" },
+      123: { title: "Barso", artist: "Ritviz", year: "2018", audioUrl: "song123.mp3" },
+      124: { title: "Thandi Hawa", artist: "Ritviz", year: "2018", audioUrl: "song124.mp3" },
+      125: { title: "Sage", artist: "Ritviz", year: "2021", audioUrl: "song125.mp3" },
+      126: { title: "Aaj Na", artist: "Ritviz", year: "2021", audioUrl: "song126.mp3" },
+      127: { title: "Baarishein", artist: "Anuv Jain", year: "2018", audioUrl: "song127.mp3" },
+      128: { title: "Riha", artist: "Anuv Jain", year: "2020", audioUrl: "song128.mp3" },
+      129: { title: "Alag Aasmaan", artist: "Anuv Jain", year: "2020", audioUrl: "song129.mp3" },
+      130: { title: "Gul", artist: "Anuv Jain", year: "2021", audioUrl: "song130.mp3" },
+      131: { title: "Mishri", artist: "Anuv Jain", year: "2020", audioUrl: "song131.mp3" },
+      132: { title: "Husn", artist: "Anuv Jain", year: "2023", audioUrl: "song132.mp3" },
+      133: { title: "Buniyaan", artist: "Anuv Jain", year: "2024", audioUrl: "song133.mp3" },
+      134: { title: "Waqt Ki Baatein", artist: "Dream Note", year: "2018", audioUrl: "song134.mp3" },
+      135: { title: "Marz", artist: "The Yellow Diary", year: "2018", audioUrl: "song135.mp3" },
+      136: { title: "Aasman", artist: "The Yellow Diary", year: "2018", audioUrl: "song136.mp3" },
+      137: { title: "Kho Gaye Hum Kahan", artist: "Jasleen Royal, Prateek Kuhad", year: "2023", audioUrl: "song137.mp3" },
+      138: { title: "Rihaee", artist: "Suzonn", year: "2020", audioUrl: "song138.mp3" },
+      139: { title: "Farq hai", artist: "Suzonn", year: "2020", audioUrl: "song139.mp3" },
+      140: { title: "Aao Chalein", artist: "Taba Chake", year: "2020", audioUrl: "song140.mp3" },
+      141: { title: "Shaayad", artist: "Taba Chake", year: "2020", audioUrl: "song141.mp3" },
+      142: { title: "Aaj Kal", artist: "Taba Chake", year: "2020", audioUrl: "song142.mp3" },
+      143: { title: "Tu Aisa Kaise Hai?", artist: "Osho Jain", year: "2020", audioUrl: "song143.mp3" },
+      144: { title: "Khwaab", artist: "Anumita Nadesan", year: "2021", audioUrl: "song144.mp3" },
+      145: { title: "Meri Baaton Mein Tu", artist: "Anuv Jain", year: "2022", audioUrl: "song145.mp3" },
+      146: { title: "Kho Gaye Hum Kahan", artist: "Anuv Jain", year: "2023", audioUrl: "song146.mp3" },
+      147: { title: "Bikhra", artist: "Abdul Hannan, Rovalio", year: "2022", audioUrl: "song147.mp3" },
+      148: { title: "Iraaday", artist: "Rovalio, Abdul Hannan", year: "2022", audioUrl: "song148.mp3" },
+      149: { title: "Afsos", artist: "Anuv Jain", year: "2024", audioUrl: "song149.mp3" },
+      150: { title: "Jo Tum Mere Ho", artist: "Anuv Jain", year: "2024", audioUrl: "song150.mp3" },
+      151: { title: "Sajni", artist: "Arijit Singh", year: "2024", audioUrl: "song151.mp3" },
+      152: { title: "Maan Meri Jaan", artist: "King", year: "2022", audioUrl: "song152.mp3" },
+      153: { title: "Tu Aake Dekh Le", artist: "King", year: "2020", audioUrl: "song153.mp3" },
+      154: { title: "Oops", artist: "King", year: "2020", audioUrl: "song154.mp3" },
+      155: { title: "Ghumshuda", artist: "King", year: "2020", audioUrl: "song155.mp3" },
+      156: { title: "Makhna", artist: "Young Stunners", year: "2020", audioUrl: "song156.mp3" },
+      157: { title: "Afsanay", artist: "Young Stunners", year: "2021", audioUrl: "song157.mp3" },
+      158: { title: "Gumaan", artist: "Young Stunners", year: "2020", audioUrl: "song158.mp3" },
+      159: { title: "Nayaab", artist: "Young Stunners", year: "2021", audioUrl: "song159.mp3" },
+      160: { title: "Agency", artist: "Talha Anjum, Rap Demon", year: "2020", audioUrl: "song160.mp3" },
+      161: { title: "Downers At Dusk", artist: "Talha Anjum", year: "2023", audioUrl: "song161.mp3" },
+      162: { title: "Gulshan-E-Haqeeqat", artist: "Talha Anjum", year: "2023", audioUrl: "song162.mp3" },
+      163: { title: "Kaun Talha", artist: "Talha Anjum", year: "2021", audioUrl: "song163.mp3" },
+      164: { title: "Kahani Suno 2.0", artist: "Kaifi Khalil", year: "2021", audioUrl: "song164.mp3" },
+      165: { title: "Bikhra", artist: "Abdul Hannan", year: "2022", audioUrl: "song165.mp3" },
+      166: { title: "Mera Safar", artist: "Bayaan", year: "2019", audioUrl: "song166.mp3" },
+      167: { title: "Nahin Milta", artist: "Bayaan", year: "2015", audioUrl: "song167.mp3" },
+      168: { title: "Teri Tasveer", artist: "Bayaan", year: "2015", audioUrl: "song168.mp3" },
+      169: { title: "Farda", artist: "Bayaan", year: "2020", audioUrl: "song169.mp3" },
+      170: { title: "Afsos", artist: "Bayaan", year: "2023", audioUrl: "song170.mp3" },
+      171: { title: "Aankhon Se Batana", artist: "Dikshant", year: "2022", audioUrl: "song171.mp3" },
+      172: { title: "Iraaday", artist: "Abdul Hannan", year: "2022", audioUrl: "song172.mp3" },
+      173: { title: "Chaand Baaliyan", artist: "Aditya A", year: "2022", audioUrl: "song173.mp3" },
+      174: { title: "Wishes", artist: "Hasan Raheem, Talal Qureshi, SomeWhatSuper", year: "2021", audioUrl: "song174.mp3" },
+      175: { title: "Peechay Hutt", artist: "Hasan Raheem", year: "2021", audioUrl: "song175.mp3" },
+      176: { title: "Joona", artist: "Hasan Raheem", year: "2022", audioUrl: "song176.mp3" },
+      177: { title: "Nahi Milta", artist: "Bayaan", year: "2015", audioUrl: "song177.mp3" },
+      178: { title: "Faasle", artist: "Kaavish, Quratulain Balouch", year: "2014", audioUrl: "song178.mp3" },
+      179: { title: "Sammi Meri Waar", artist: "Quratulain Balouch, Umair Jaswal", year: "2014", audioUrl: "song179.mp3" },
+      180: { title: "Afreen Afreen", artist: "Rahat Fateh Ali Khan, Momina Mustehsan", year: "2016", audioUrl: "song180.mp3" },
+      181: { title: "Pasoori", artist: "Ali Sethi, Shae Gill", year: "2022", audioUrl: "song181.mp3" },
+      182: { title: "Tu Jhoom", artist: "Naseebo Lal, Abida Parveen", year: "2022", audioUrl: "song182.mp3" },
+      183: { title: "Kana Yaari", artist: "Kaifi Khalil, Eva B, Abdul Wahab Bugti", year: "2022", audioUrl: "song183.mp3" },
+      184: { title: "Blockbuster", artist: "Farasat Anees, Young Stunners", year: "2023", audioUrl: "song184.mp3" },
+      185: { title: "Iraaday", artist: "Abdul Hannan, Rovalio", year: "2022", audioUrl: "song185.mp3" },
+      186: { title: "Aisay Kaisay", artist: "Hasan Raheem", year: "2021", audioUrl: "song186.mp3" },
+      187: { title: "Nindiya Re", artist: "Kaavish", year: "2015", audioUrl: "song187.mp3" },
+      188: { title: "Hona Tha Pyar", artist: "Atif Aslam, Hadiqa Kiani", year: "2011", audioUrl: "song188.mp3" },
+      189: { title: "Man Kunto Maula", artist: "Abida Parveen, Asrar", year: "2016", audioUrl: "song189.mp3" },
+      190: { title: "Aaja Nachle", artist: "Shilpa Rao, Bappi Lahiri", year: "2007", audioUrl: "song190.mp3" },
+      191: { title: "Aahista", artist: "Pankaj Udhas", year: "1986", audioUrl: "song191.mp3" },
+      192: { title: "Made in India", artist: "Alisha Chinai", year: "1995", audioUrl: "song192.mp3" },
+      193: { title: "Deewane To Deewane Hain", artist: "Shweta Shetty", year: "1997", audioUrl: "song193.mp3" },
+      194: { title: "Gur Nalon Ishq Mitha", artist: "Malkit Singh", year: "1990", audioUrl: "song194.mp3" },
+      195: { title: "Tunak Tunak Tun", artist: "Daler Mehndi", year: "1998", audioUrl: "song195.mp3" },
+      196: { title: "Ho Jayegi Balle Balle", artist: "Daler Mehndi", year: "1997", audioUrl: "song196.mp3" },
+      197: { title: "Sayonee", artist: "Junoon", year: "1997", audioUrl: "song197.mp3" },
+      198: { title: "Aadat", artist: "Jal", year: "2004", audioUrl: "song198.mp3" },
+      199: { title: "Woh Lamhe Woh Baatein", artist: "Atif Aslam", year: "2005", audioUrl: "song199.mp3" },
+      200: { title: "Rabba", artist: "Rabi Shergill", year: "2005", audioUrl: "song200.mp3" },
+      201: { title: "Bulla Ki Jaana", artist: "Rabbani", year: "2005", audioUrl: "song201.mp3" },
+      202: { title: "Teri Deewani", artist: "Kailash Kher", year: "2006", audioUrl: "song202.mp3" },
+      203: { title: "Allah Ke Bande", artist: "Kailash Kher", year: "2006", audioUrl: "song203.mp3" },
+      204: { title: "Ya Rabba", artist: "Kailash Kher", year: "2007", audioUrl: "song204.mp3" },
+      205: { title: "Bheegi Bheegi", artist: "Gangster", year: "2006", audioUrl: "song205.mp3" },
+      206: { title: "Ishq Bina", artist: "A.R. Rahman, Anuradha Sriram, Sujatha, Sonu Nigam", year: "1999", audioUrl: "song206.mp3" },
+      207: { title: "Mann Kasturi", artist: "Indian Ocean", year: "2015", audioUrl: "song207.mp3" },
+      208: { title: "Pahadon Mein", artist: "Salman Elahi", year: "2020", audioUrl: "song208.mp3" },
+      209: { title: "Rangi Saari", artist: "Kavita Seth, Kanishk Seth", year: "2021", audioUrl: "song209.mp3" },
+      210: { title: "Ishq Hai", artist: "Anurag Saikia, Romy, Amar Jalal, Varun Arora", year: "2020", audioUrl: "song210.mp3" },
+      211: { title: "Sukoon", artist: "Madhur Sharma, Abdul Shaikh", year: "2022", audioUrl: "song211.mp3" },
+      212: { title: "Haseen", artist: "Talwiinder", year: "2023", audioUrl: "song212.mp3" },
+      213: { title: "Dhup Chik", artist: "Raftaar, Farhan Khan, Raxstar", year: "2013", audioUrl: "song213.mp3" },
+      214: { title: "Nanchaku", artist: "Seedhe Maut, MC Stan", year: "2022", audioUrl: "song214.mp3" },
+      215: { title: "Namastute", artist: "Seedhe Maut", year: "2018", audioUrl: "song215.mp3" },
+      216: { title: "Kohra", artist: "Seedhe Maut", year: "2022", audioUrl: "song216.mp3" },
+      217: { title: "Do Guna", artist: "Seedhe Maut", year: "2024", audioUrl: "song217.mp3" },
+      218: { title: "Nalla Freestyle", artist: "Seedhe Maut", year: "2023", audioUrl: "song218.mp3" },
+      219: { title: "Aafat", artist: "Nucleya, Bhanushree", year: "2021", audioUrl: "song219.mp3" },
+      220: { title: "Laung Gawacha", artist: "Nucleya, Benny Dayal", year: "2017", audioUrl: "song220.mp3" },
+      221: { title: "Bass Rani", artist: "Nucleya", year: "2013", audioUrl: "song221.mp3" },
+      222: { title: "Khoya", artist: "Dhanji", year: "2024", audioUrl: "song222.mp3" },
+      223: { title: "Jashn-E-Hip-Hop", artist: "Dino James", year: "2023", audioUrl: "song223.mp3" },
+      224: { title: "Mera Bhai", artist: "Dino James", year: "2019", audioUrl: "song224.mp3" },
+      225: { title: "Farak", artist: "Divine", year: "2019", audioUrl: "song225.mp3" },
+      226: { title: "Mirchi", artist: "Divine, Stylo G, MC Altaf, Phenom", year: "2020", audioUrl: "song226.mp3" },
+      227: { title: "3:59 AM", artist: "Divine", year: "2019", audioUrl: "song227.mp3" },
+      228: { title: "Kaam 25", artist: "Divine", year: "2018", audioUrl: "song228.mp3" },
+      229: { title: "Chal Bombay", artist: "Divine", year: "2019", audioUrl: "song229.mp3" },
+      230: { title: "Mere Gully Mein", artist: "Divine, Naezy", year: "2015", audioUrl: "song230.mp3" },
+      231: { title: "Ari Ari", artist: "Bloodywood", year: "2022", audioUrl: "song231.mp3" },
+      232: { title: "Dana Dan", artist: "Bloodywood", year: "2022", audioUrl: "song232.mp3" },
+      233: { title: "Endurant", artist: "Bloodywood", year: "2022", audioUrl: "song233.mp3" },
+      234: { title: "Machi Bhasad", artist: "Bloodywood", year: "2022", audioUrl: "song234.mp3" },
+      235: { title: "Tandanan", artist: "Bloodywood", year: "2022", audioUrl: "song235.mp3" },
+      236: { title: "Zariya", artist: "A.R. Rahman, Farah Siraj, Ani Choying Drolma", year: "2013", audioUrl: "song236.mp3" },
+      237: { title: "Ranjish Hi Sahi", artist: "Ali Sethi", year: "2022", audioUrl: "song237.mp3" },
+      238: { title: "Tu Jhoom", artist: "Abida Parveen, Naseebo Lal", year: "2022", audioUrl: "song238.mp3" },
+      239: { title: "Winning Speech", artist: "Karan Aujla", year: "2023", audioUrl: "song239.mp3" },
+      240: { title: "Softly", artist: "Karan Aujla", year: "2023", audioUrl: "song240.mp3" },
+      241: { title: "Admiring You", artist: "Karan Aujla, Preston Pablo", year: "2023", audioUrl: "song241.mp3" },
+      242: { title: "God Damn", artist: "Badshah, Hiten", year: "2024", audioUrl: "song242.mp3" },
+      243: { title: "Daaku", artist: "Chani Nattan, Inderpal Moga", year: "2024", audioUrl: "song243.mp3" },
+      244: { title: "Big Dawgs", artist: "Hanumankind, Kalmi", year: "2024", audioUrl: "song244.mp3" },
+      245: { title: "Go To Sleep", artist: "Hanumankind", year: "2023", audioUrl: "song245.mp3" },
+      246: { title: "Run It Up", artist: "Hanumankind", year: "2023", audioUrl: "song246.mp3" },
+      247: { title: "The Last Ride", artist: "Sidhu Moose Wala", year: "2021", audioUrl: "song247.mp3" },
+      248: { title: "295", artist: "Sidhu Moose Wala", year: "2021", audioUrl: "song248.mp3" },
+      249: { title: "Levels", artist: "Sidhu Moose Wala", year: "2021", audioUrl: "song249.mp3" },
+      250: { title: "So High", artist: "Sidhu Moose Wala", year: "2017", audioUrl: "song250.mp3" }
     };
 
-    const currentSong = songs[cardId] || songs["1"];
+    // LOAD CURRENT CARD DATA
+    const currentSong = songs[cardId] || songs[1];
+    document.getElementById("cardDisplayId").innerText = "CARD " + String(cardId).padStart(3, '0');
     document.getElementById("audioSource").src = currentSong.audioUrl;
     document.getElementById("audioPlayer").load();
 
@@ -103,16 +350,16 @@
     function toggleAudio() {
       if (audio.paused) {
         audio.play();
-        playBtn.innerText = "⏸ Pause Audio";
+        playBtn.innerText = "⏸ Pause Audio Snippet";
       } else {
         audio.pause();
-        playBtn.innerText = "▶ Play Audio";
+        playBtn.innerText = "▶ Play Audio Snippet";
       }
     }
 
     function revealAnswer() {
       document.getElementById("songTitle").innerText = currentSong.title;
-      document.getElementById("movieArtist").innerText = "Movie: " + currentSong.movie;
+      document.getElementById("artistName").innerText = "Artist: " + currentSong.artist;
       document.getElementById("releaseYear").innerText = currentSong.year;
       document.getElementById("answerBox").style.display = "block";
     }

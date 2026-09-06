@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indian Hitster</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .card {
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 350px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    h1 { color: #1db954; font-size: 24px; margin-bottom: 8px; }
+    p { color: #b3b3b3; font-size: 14px; margin-bottom: 24px; }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+    .btn-play { background-color: #1db954; color: #ffffff; }
+    .btn-reveal { background-color: #333333; color: #ffffff; }
+    .answer-box {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #282828;
+      border-radius: 8px;
+      display: none;
+      border: 1px solid #1db954;
+    }
+    .song-title { font-size: 18px; font-weight: bold; }
+    .movie-artist { font-size: 14px; color: #b3b3b3; margin-top: 4px; }
+    .release-year { font-size: 32px; font-weight: bold; color: #1db954; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🎵 Indian Hitster</h1>
+    <p>Listen carefully! Where does this land on your timeline?</p>
+
+    <audio id="audioPlayer">
+      <source id="audioSource" src="" type="audio/mpeg">
+    </audio>
+
+    <button class="btn btn-play" id="playBtn" onclick="toggleAudio()">▶ Play Audio</button>
+    <button class="btn btn-reveal" onclick="revealAnswer()">👁 Reveal Details</button>
+
+    <div id="answerBox" class="answer-box">
+      <div class="song-title" id="songTitle">---</div>
+      <div class="movie-artist" id="movieArtist">---</div>
+      <div class="release-year" id="releaseYear">----</div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const cardId = urlParams.get('id') || '1';
+
+    // EDIT YOUR SONGS HERE IN STEP 5
+    const songs = {
+      "1": {
+        title: "Chaiyya Chaiyya",
+        movie: "Dil Se",
+        year: "1998",
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+      },
+      "2": {
+        title: "Kal Ho Naa Ho",
+        movie: "Kal Ho Naa Ho",
+        year: "2003",
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+      }
+    };
+
+    const currentSong = songs[cardId] || songs["1"];
+    document.getElementById("audioSource").src = currentSong.audioUrl;
+    document.getElementById("audioPlayer").load();
+
+    const audio = document.getElementById("audioPlayer");
+    const playBtn = document.getElementById("playBtn");
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+        playBtn.innerText = "⏸ Pause Audio";
+      } else {
+        audio.pause();
+        playBtn.innerText = "▶ Play Audio";
+      }
+    }
+
+    function revealAnswer() {
+      document.getElementById("songTitle").innerText = currentSong.title;
+      document.getElementById("movieArtist").innerText = "Movie: " + currentSong.movie;
+      document.getElementById("releaseYear").innerText = currentSong.year;
+      document.getElementById("answerBox").style.display = "block";
+    }
+  </script>
+
+</body>
+</html>

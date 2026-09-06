@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Indian Hitster - Secret Card</title>
+  <title>Indian Hitster</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #121212;
       color: #ffffff;
       display: flex;
@@ -22,20 +22,56 @@
       padding: 25px;
       border-radius: 16px;
       text-align: center;
-      max-width: 360px;
+      max-width: 380px;
       width: 100%;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    .score-board {
+      background: #282828;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #1db954;
+      display: inline-block;
+      margin-bottom: 12px;
     }
     .card-id {
       color: #1db954;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 16px;
       letter-spacing: 1px;
     }
-    h1 { color: #ffffff; font-size: 22px; margin: 10px 0 8px; }
-    p { color: #b3b3b3; font-size: 13px; margin-bottom: 20px; }
-    
-    /* Container styled to fit the Spotify player cleanly */
+    h1 { color: #ffffff; font-size: 22px; margin: 5px 0; }
+    p { color: #b3b3b3; font-size: 13px; margin-bottom: 15px; }
+
+    /* Manual Input Section */
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    input[type="number"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #282828;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+    }
+    .btn-select {
+      padding: 10px 16px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Player Container */
     .player-container {
       width: 100%;
       height: 152px;
@@ -44,26 +80,23 @@
       margin-bottom: 15px;
       background-color: #000000;
     }
-    iframe {
+    iframe { width: 100%; height: 100%; border: 0; }
+
+    .btn-action {
       width: 100%;
-      height: 100%;
-      border: 0;
-    }
-    
-    .btn-reveal {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      font-size: 15px;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 14px;
       font-weight: bold;
       border: none;
       border-radius: 25px;
       cursor: pointer;
-      background-color: #1db954;
-      color: #ffffff;
     }
+    .btn-reveal { background-color: #1db954; color: #ffffff; }
+    .btn-coin { background-color: #f1c40f; color: #000000; }
+
     .answer-box {
-      margin-top: 20px;
+      margin-top: 15px;
       padding: 15px;
       background-color: #282828;
       border-radius: 8px;
@@ -72,52 +105,81 @@
     }
     .song-title { font-size: 18px; font-weight: bold; color: #ffffff; }
     .artist-name { font-size: 14px; color: #b3b3b3; margin-top: 4px; }
-    .release-year { font-size: 32px; font-weight: bold; color: #1db954; margin-top: 8px; }
+    .release-year { font-size: 30px; font-weight: bold; color: #1db954; margin-top: 6px; }
   </style>
 </head>
 <body>
 
   <div class="card">
+    <div class="score-board">🪙 Hitster Coins: <span id="coinCount">0</span></div>
+    
+    <!-- Intelligent Card Selector -->
+    <div class="input-group">
+      <input type="number" id="manualCardInput" placeholder="Enter Card # (1-250)" min="1" max="250">
+      <button class="btn-select" onclick="loadManualCard()">Go</button>
+    </div>
+
     <div class="card-id" id="cardDisplayId">CARD ---</div>
     <h1>🎵 Indian Hitster</h1>
-    <p>Press Play below to listen. Guess the song & year before revealing!</p>
+    <p>Listen to the track, guess the details, then reveal!</p>
 
-    <!-- Spotify Audio Player -->
     <div class="player-container">
       <iframe id="spotifyPlayer" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
 
-    <button class="btn-reveal" onclick="revealAnswer()">👁 Reveal Song, Artist & Year</button>
+    <button class="btn-action btn-reveal" onclick="revealAnswer()">👁 Reveal Song, Artist & Year</button>
 
     <div id="answerBox" class="answer-box">
       <div class="song-title" id="songTitle">---</div>
       <div class="artist-name" id="artistName">---</div>
       <div class="release-year" id="releaseYear">----</div>
+      <button class="btn-action btn-coin" onclick="addCoin()">+1 Hitster Coin!</button>
     </div>
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const cardId = parseInt(urlParams.get('id')) || 1;
+    let coins = 0;
 
-    // Database with verified Spotify Track IDs
     const songs = {
       1: { title: "Mere Sapno Ki Rani", artist: "Kishore Kumar", year: "1969", spotifyId: "1P2MllvM6aP4W5x17A612r" },
       2: { title: "Pyaar Deewana Hota Hai", artist: "Kishore Kumar", year: "1971", spotifyId: "6pA3Vq0R4fA3x6L2p1D1A2" },
       3: { title: "Dum Maro Dum", artist: "Asha Bhosle", year: "1971", spotifyId: "0L3R5W8X9Y7Z6A5B4C3D2E" }
     };
 
-    const currentSong = songs[cardId] || songs[1];
-    
-    document.getElementById("cardDisplayId").innerText = "CARD " + String(cardId).padStart(3, '0');
-    document.getElementById("spotifyPlayer").src = "https://open.spotify.com/embed/track/" + currentSong.spotifyId + "?utm_source=generator&theme=0";
-
-    function revealAnswer() {
+    function loadCard(id) {
+      const currentSong = songs[id] || songs[1];
+      document.getElementById("cardDisplayId").innerText = "CARD " + String(id).padStart(3, '0');
+      document.getElementById("spotifyPlayer").src = "https://open.spotify.com/embed/track/" + currentSong.spotifyId + "?utm_source=generator&theme=0";
+      document.getElementById("answerBox").style.display = "none";
+      
+      // Update UI fields
       document.getElementById("songTitle").innerText = currentSong.title;
       document.getElementById("artistName").innerText = "Artist: " + currentSong.artist;
       document.getElementById("releaseYear").innerText = currentSong.year;
+    }
+
+    function loadManualCard() {
+      const inputVal = parseInt(document.getElementById("manualCardInput").value);
+      if (inputVal && songs[inputVal]) {
+        loadCard(inputVal);
+      } else {
+        alert("Card not found! Please enter a valid card number.");
+      }
+    }
+
+    function revealAnswer() {
       document.getElementById("answerBox").style.display = "block";
     }
+
+    function addCoin() {
+      coins++;
+      document.getElementById("coinCount").innerText = coins;
+    }
+
+    // Initialize on page load using URL parameter or default to 1
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCardId = parseInt(urlParams.get('id')) || 1;
+    loadCard(initialCardId);
   </script>
 
 </body>

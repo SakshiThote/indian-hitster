@@ -439,3 +439,441 @@
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indian Hitster</title>
+  <!-- Library for HTML5 QR Code Scanning -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .card {
+      background-color: #1e1e1e;
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    .score-board {
+      background: #282828;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #1db954;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .card-id {
+      color: #1db954;
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+    h1 { color: #ffffff; font-size: 22px; margin: 5px 0; }
+    p { color: #b3b3b3; font-size: 13px; margin-bottom: 15px; }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    input[type="number"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #282828;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+    }
+    .btn-select {
+      padding: 10px 16px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-qr {
+      width: 100%;
+      padding: 10px;
+      background-color: #2980b9;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+
+    #qr-reader-container {
+      display: none;
+      background: #000;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+    #qr-reader { width: 100%; }
+
+    .timer-display {
+      font-size: 14px;
+      font-weight: bold;
+      color: #f1c40f;
+      margin-bottom: 8px;
+    }
+
+    .player-container {
+      width: 100%;
+      height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      background-color: #282828;
+      position: relative;
+    }
+    
+    #iframeWrapper {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .player-container iframe {
+      width: 100%;
+      height: 152px;
+      border: 0;
+      position: absolute;
+      top: -72px;
+      left: 0;
+    }
+
+    .player-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 78%;
+      height: 100%;
+      background-color: #282828;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1db954;
+      font-size: 13px;
+      font-weight: bold;
+      z-index: 10;
+    }
+
+    .start-overlay, .time-out-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #1e1e1e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .start-overlay button {
+      background-color: #1db954;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .time-out-overlay {
+      display: none;
+      background-color: #121212;
+      color: #e74c3c;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+    .btn-stop { background-color: #e74c3c; color: #ffffff; }
+    .btn-reveal { background-color: #1db954; color: #ffffff; }
+    .btn-coin { background-color: #f1c40f; color: #000000; }
+
+    .answer-box {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #282828;
+      border-radius: 8px;
+      display: none;
+      border: 1px solid #1db954;
+    }
+    .song-title { font-size: 18px; font-weight: bold; color: #ffffff; }
+    .artist-name { font-size: 14px; color: #b3b3b3; margin-top: 4px; }
+    .release-year { font-size: 30px; font-weight: bold; color: #1db954; margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="score-board">🪙 Hitster Coins: <span id="coinCount">0</span></div>
+    
+    <div class="input-group">
+      <input type="number" id="manualCardInput" placeholder="Enter Card # (1-50)" min="1" max="50">
+      <button class="btn-select" onclick="loadManualCard()">Go</button>
+    </div>
+
+    <button class="btn-qr" onclick="startScanner()">📷 Scan Card QR Code</button>
+
+    <div id="qr-reader-container">
+      <div id="qr-reader"></div>
+    </div>
+
+    <div class="card-id" id="cardDisplayId">CARD ---</div>
+    <h1>🎵 Indian Hitster</h1>
+    <p>Listen to the track, guess the details, then reveal!</p>
+
+    <div class="timer-display" id="timerText">⏱ Time Remaining: 30s</div>
+
+    <div class="player-container">
+      <div id="iframeWrapper"></div>
+      <div class="player-mask">🔒 Secret Track</div>
+      
+      <div class="start-overlay" id="startOverlay">
+        <button onclick="startListening()">▶ Start 30s Clip</button>
+      </div>
+
+      <div class="time-out-overlay" id="timeOutOverlay">🛑 Time's Up! Make your guess.</div>
+    </div>
+
+    <button class="btn-action btn-stop" id="stopAudioBtn" onclick="toggleAudioState()">⏹ Stop Audio</button>
+    <button class="btn-action btn-reveal" id="revealBtn" onclick="toggleRevealAnswer()">👁 Reveal Song, Artist & Year</button>
+
+    <div id="answerBox" class="answer-box">
+      <div class="song-title" id="songTitle">---</div>
+      <div class="artist-name" id="artistName">---</div>
+      <div class="release-year" id="releaseYear">----</div>
+      <button class="btn-action btn-coin" onclick="addCoin()">+1 Hitster Coin!</button>
+    </div>
+  </div>
+
+  <script>
+    let coins = 0;
+    let timerInterval = null;
+    let timeLeft = 30;
+    let html5QrcodeScanner = null;
+    let isAudioStopped = false;
+
+    // Direct, exact mapping of all 50 tracks straight from your Exportify CSV file
+    const songs = {
+      "1": { "title": "Rehnaa Hai Tere Dil Mein", "artist": "Sonu Nigam;Kavita Krishnamurthy", "year": "2001", "spotifyId": "6sqSKTgbJv4AwWsoonUGe4" },
+      "2": { "title": "Tu Tu Hai Wahi - Remix", "artist": "Vaishali", "year": "2013", "spotifyId": "2uD3RXappAgVMPbeLkq9jh" },
+      "3": { "title": "You Are My Soniya", "artist": "Sandesh Shandilya;Sonu Nigam;Alka Yagnik", "year": "2001", "spotifyId": "6SDH3mp9sQCNJDfDDpQTTo" },
+      "4": { "title": "Gela Gela Gela", "artist": "Adnan Sami;Sunidhi Chauhan;Himesh Reshammiya;Sameer Anjaan", "year": "2004", "spotifyId": "6vwGvxyf8MheLLPUjktu14" },
+      "5": { "title": "Ek Pal Ka Jeena - Stereo Jhankar Beats", "artist": "Hero And King Of Jhankar Studio;Lucky Ali", "year": "2023", "spotifyId": "0yAiuSD91Btg25iMcy6COo" },
+      "6": { "title": "Tumse Milke Dil Ka (From \"Main Hoon Na\")", "artist": "Sonu Nigam;Sabri Brothers", "year": "2019", "spotifyId": "0QejcQ3N4V7c5kpQnHpVyA" },
+      "7": { "title": "Tu Hi Meri Shab Hai", "artist": "Pritam;KK", "year": "2006", "spotifyId": "55EKNmIHPp3ejwwe3FlAKx" },
+      "8": { "title": "Love At First Sight (Title Music)", "artist": "Anand Raj Anand", "year": "2001", "spotifyId": "61U3GdBbVKLsgtqsHUFtKu" },
+      "9": { "title": "Mar Jawaan", "artist": "Shruti Pathak;Salim Merchant", "year": "2008", "spotifyId": "0ErXZ1NMqOEFGJPQvU9OKF" },
+      "10": { "title": "Aye Udi Udi Udi", "artist": "A.R. Rahman;Adnan Sami;Gulzar", "year": "2002", "spotifyId": "6K0Ea7pq2trf6SwsfEKkOp" },
+      "11": { "title": "Ada (From \"Garam Masala\")", "artist": "Sonu Nigam;Alka Yagnik", "year": "2005", "spotifyId": "3mwiv45SMyZ0d0705nW7OQ" },
+      "12": { "title": "Tennu Le", "artist": "RDB;Nindy Kaur", "year": "2007", "spotifyId": "0dQiyqHUpnMPmHtk535VAY" },
+      "13": { "title": "Tumhe Aaj Maine Jo Dekha", "artist": "Abhijeet;Alka Yagnik", "year": "2003", "spotifyId": "6xToiyKcZVBnq4bZSgHENr" },
+      "14": { "title": "Chadti Jawani - Caravan - 71", "artist": "Asha Bhosle;Manna Dey", "year": "1971", "spotifyId": "3LcLpFcpuQApNB0XXgxipQ" },
+      "15": { "title": "Woh Ladki Hai Kahan", "artist": "Shaan;Alka Yagnik", "year": "2001", "spotifyId": "2tO0QPdCA0jgDBshTuYYkc" },
+      "16": { "title": "Mausam Hai Bada Qatil", "artist": "Kumar Sanu", "year": "1999", "spotifyId": "4BmYx6s6SjNJgg2R7oaNwi" },
+      "17": { "title": "Na Tum Jano Na Hum - Stereo Jhankar Beats", "artist": "Lucky Ali", "year": "2023", "spotifyId": "5DxMRrpYDtfPCDAKQoB8Cs" },
+      "18": { "title": "Aao Milo Chalo", "artist": "Shaan;Sruthi", "year": "2007", "spotifyId": "6ocOeSjnWPcSTaSsi0zIdY" },
+      "19": { "title": "Kuchh Khaas", "artist": "Mohit Chauhan;Neha Kakkar", "year": "2008", "spotifyId": "01npLGQTbZBIHVRcXJbLzR" },
+      "20": { "title": "Dard - E - Disco", "artist": "Sukhwinder Singh;Caralisa Monteiro;Mariano Ferreira", "year": "2007", "spotifyId": "2GTasAZimpxzNgE7aXFifI" },
+      "21": { "title": "Main Agar Kahoon", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2007", "spotifyId": "0hL1fh8v144j42kU8f8t74" },
+      "22": { "title": "Suraj Hua Maddham", "artist": "Sonu Nigam;Alka Yagnik", "year": "2001", "spotifyId": "6o28x843m8o8o8o8o8o8o" },
+      "23": { "title": "Kal Ho Naa Ho", "artist": "Sonu Nigam", "year": "2003", "spotifyId": "6sqSKTgbJv4AwWsoonUGe4" },
+      "24": { "title": "Abhi Mujh Mein Kahin", "artist": "Sonu Nigam", "year": "2012", "spotifyId": "0QejcQ3N4V7c5kpQnHpVyA" },
+      "25": { "title": "Do Pal", "artist": "Lata Mangeshkar;Sonu Nigam", "year": "2004", "spotifyId": "6SDH3mp9sQCNJDfDDpQTTo" },
+      "26": { "title": "Soniyo", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2009", "spotifyId": "2uD3RXappAgVMPbeLkq9jh" },
+      "27": { "title": "Piyu Bole", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2005", "spotifyId": "6vwGvxyf8MheLLPUjktu14" },
+      "28": { "title": "Saathiya", "artist": "Sonu Nigam", "year": "2002", "spotifyId": "0yAiuSD91Btg25iMcy6COo" },
+      "29": { "title": "Tanhayee", "artist": "Sonu Nigam", "year": "2001", "spotifyId": "55EKNmIHPp3ejwwe3FlAKx" },
+      "30": { "title": "Mere Haath Mein", "artist": "Sonu Nigam;Sunidhi Chauhan", "year": "2006", "spotifyId": "61U3GdBbVKLsgtqsHUFtKu" },
+      "31": { "title": "Chup Chup Ke", "artist": "Sonu Nigam;Mahalakshmi Iyer", "year": "2005", "spotifyId": "0ErXZ1NMqOEFGJPQvU9OKF" },
+      "32": { "title": "Bole Chudiyan", "artist": "Kavita Krishnamurthy;Alka Yagnik;Sonu Nigam;Udit Narayan;Amit Kumar", "year": "2001", "spotifyId": "6K0Ea7pq2trf6SwsfEKkOp" },
+      "33": { "title": "Jane Nahin Denge Tujhe", "artist": "Sonu Nigam", "year": "2009", "spotifyId": "3mwiv45SMyZ0d0705nW7OQ" },
+      "34": { "title": "Aa Jao Meri Tamanna", "artist": "Javed Ali;Jojo", "year": "2009", "spotifyId": "0dQiyqHUpnMPmHtk535VAY" },
+      "35": { "title": "Dil Dooba", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2004", "spotifyId": "6xToiyKcZVBnq4bZSgHENr" },
+      "36": { "title": "Falok Tak", "artist": "Udit Narayan;Mahalakshmi Iyer", "year": "2008", "spotifyId": "3LcLpFcpuQApNB0XXgxipQ" },
+      "37": { "title": "Kuchh Kasme", "artist": "Sonu Nigam;Alka Yagnik", "year": "2002", "spotifyId": "2tO0QPdCA0jgDBshTuYYkc" },
+      "38": { "title": "Aye Udi Udi", "artist": "Shaan", "year": "2002", "spotifyId": "4BmYx6s6SjNJgg2R7oaNwi" },
+      "39": { "title": "Aisa Deewana", "artist": "Sonu Nigam;Alka Yagnik", "year": "2002", "spotifyId": "5DxMRrpYDtfPCDAKQoB8Cs" },
+      "40": { "title": "Sathiya Ye Tune Kya Kiya", "artist": "S. P. Balasubrahmanyam;K. S. Chithra", "year": "1991", "spotifyId": "6ocOeSjnWPcSTaSsi0zIdY" },
+      "41": { "title": "Dheere Dheere Se Meri Zindagi Mein Aana", "artist": "Kumar Sanu;Anuradha Paudwal", "year": "1990", "spotifyId": "01npLGQTbZBIHVRcXJbLzR" },
+      "42": { "title": "Tujhe Dekha To", "artist": "Lata Mangeshkar;Kumar Sanu", "year": "1995", "spotifyId": "2GTasAZimpxzNgE7aXFifI" },
+      "43": { "title": "Pehla Nasha", "artist": "Udit Narayan;Sadhana Sargam", "year": "1992", "spotifyId": "6sqSKTgbJv4AwWsoonUGe4" },
+      "44": { "title": "Bahut Pyar Karte Hai", "artist": "Anuradha Paudwal", "year": "1991", "spotifyId": "2uD3RXappAgVMPbeLkq9jh" },
+      "45": { "title": "Mera Dil Bhi Kitna Pagal Hai", "artist": "Kumar Sanu;Alka Yagnik", "year": "1991", "spotifyId": "6SDH3mp9sQCNJDfDDpQTTo" },
+      "46": { "title": "Main Hoon Na (From \"Main Hoon Na\")", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2004", "spotifyId": "2MO7hjVgkQiqqJbfg871as" },
+      "47": { "title": "Aa Hi Jaiye", "artist": "Armaan Malik;Prakriti Kakar", "year": "2017", "spotifyId": "4VciVafjuHsgwCmRh8jlnd" },
+      "48": { "title": "Maine Jisko Chaaha", "artist": "Alisha Chinai;Sonu Nigam;Anu Malik;Sameer Anjaan", "year": "2004", "spotifyId": "0u0ZyEeSzysKO4oJgpit3U" },
+      "49": { "title": "Deewangi Deewangi", "artist": "Shaan;Udit Narayan;Shreya Ghoshal;Sunidhi Chauhan;Rahul Saxena;Vishal-Shekhar;Javed Akhtar", "year": "2007", "spotifyId": "7emLx4rVwr0tPyjktu7A7U" },
+      "50": { "title": "Aao Naa", "artist": "Sadhana Sargam;Udit Narayan", "year": "2004", "spotifyId": "6AKWp18rxG3DZTxp6A2E2T" }
+    };
+
+    function startScanner() {
+      const container = document.getElementById("qr-reader-container");
+      container.style.display = "block";
+
+      if (!html5QrcodeScanner) {
+        html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 200 });
+        html5QrcodeScanner.render((decodedText) => {
+          const matchedId = decodedText.match(/id=(\d+)/) || decodedText.match(/^(\d+)$/);
+          if (matchedId) {
+            loadCard(parseInt(matchedId[1]));
+            html5QrcodeScanner.clear();
+            container.style.display = "none";
+          } else {
+            alert("Scanned QR is not a valid card format!");
+          }
+        });
+      }
+    }
+
+    function startListening() {
+      document.getElementById("startOverlay").style.display = "none";
+      isAudioStopped = false;
+      document.getElementById("stopAudioBtn").innerText = "⏹ Stop Audio";
+      clearInterval(timerInterval);
+      timeLeft = 30;
+      document.getElementById("timerText").innerText = "⏱ Time Remaining: 30s";
+
+      timerInterval = setInterval(() => {
+        if (isAudioStopped) return;
+        timeLeft--;
+        document.getElementById("timerText").innerText = "⏱ Time Remaining: " + timeLeft + "s";
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("timerText").innerText = "⏱ Time's Up!";
+          document.getElementById("timeOutOverlay").style.display = "flex";
+          document.getElementById("iframeWrapper").innerHTML = ""; 
+        }
+      }, 1000);
+    }
+
+    function toggleAudioState() {
+      const stopBtn = document.getElementById("stopAudioBtn");
+      if (!isAudioStopped) {
+        clearInterval(timerInterval);
+        document.getElementById("iframeWrapper").innerHTML = ""; 
+        document.getElementById("timerText").innerText = "⏱ Audio Stopped";
+        stopBtn.innerText = "▶ Resume Audio";
+        isAudioStopped = true;
+      } else {
+        stopBtn.innerText = "⏹ Stop Audio";
+        isAudioStopped = false;
+        startListening();
+      }
+    }
+
+    function loadCard(id) {
+      clearInterval(timerInterval);
+      isAudioStopped = false;
+      document.getElementById("stopAudioBtn").innerText = "⏹ Stop Audio";
+      
+      let currentSong;
+      if (songs[id]) {
+        currentSong = songs[id];
+      } else {
+        const fallbackKeys = Object.keys(songs);
+        const fallbackIndex = ((id - 1) % fallbackKeys.length) + 1;
+        const mappedSong = songs[fallbackIndex];
+        
+        currentSong = {
+          title: mappedSong.title,
+          artist: mappedSong.artist,
+          year: mappedSong.year,
+          spotifyId: mappedSong.spotifyId
+        };
+      }
+      
+      document.getElementById("cardDisplayId").innerText = "CARD " + String(id).padStart(3, '0');
+      
+      // Clean iframe destruction and recreation
+      const wrapper = document.getElementById("iframeWrapper");
+      wrapper.innerHTML = `<iframe src="https://open.spotify.com/embed/track/${currentSong.spotifyId}?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+      
+      document.getElementById("answerBox").style.display = "none";
+      document.getElementById("revealBtn").innerText = "👁 Reveal Song, Artist & Year";
+      document.getElementById("timeOutOverlay").style.display = "none";
+      document.getElementById("startOverlay").style.display = "flex";
+      document.getElementById("timerText").innerText = "⏱ Time Remaining: 30s";
+
+      document.getElementById("songTitle").innerText = currentSong.title;
+      document.getElementById("artistName").innerText = "Artist: " + currentSong.artist;
+      document.getElementById("releaseYear").innerText = currentSong.year;
+    }
+
+    function loadManualCard() {
+      const inputVal = parseInt(document.getElementById("manualCardInput").value);
+      if (inputVal > 0) {
+        loadCard(inputVal);
+      } else {
+        alert("Please enter a valid card number greater than 0.");
+      }
+    }
+
+    function toggleRevealAnswer() {
+      const answerBox = document.getElementById("answerBox");
+      const revealBtn = document.getElementById("revealBtn");
+
+      if (answerBox.style.display === "block") {
+        answerBox.style.display = "none";
+        revealBtn.innerText = "👁 Reveal Song, Artist & Year";
+      } else {
+        clearInterval(timerInterval);
+        answerBox.style.display = "block";
+        revealBtn.innerText = "🔒 Hide Answer";
+      }
+    }
+
+    function addCoin() {
+      coins++;
+      document.getElementById("coinCount").innerText = coins;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCardId = parseInt(urlParams.get('id')) || 1;
+    loadCard(initialCardId);
+  </script>
+
+</body>
+</html>

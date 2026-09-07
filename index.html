@@ -386,7 +386,7 @@
       document.getElementById("cardDisplayId").innerText = "CARD " + String(id).padStart(3, '0');
       
       const wrapper = document.getElementById("iframeWrapper");
-      wrapper.innerHTML = `<iframe src="https://open.spotify.com/embed/track/${currentSong.spotifyId}?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+      wrapper.innerHTML = `<iframe src="https://open.spotify.com/embed/track/${currentSong.spotifyId}?utm_source=generator&theme=0&t=30" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
       
       document.getElementById("answerBox").style.display = "none";
       document.getElementById("revealBtn").innerText = "👁 Reveal Song, Artist & Year";

@@ -72,7 +72,7 @@
     }
     .btn-qr {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       background-color: #2980b9;
       color: #fff;
       border: none;
@@ -80,6 +80,7 @@
       font-weight: bold;
       margin-bottom: 15px;
       cursor: pointer;
+      font-size: 15px;
     }
     #qr-reader-container {
       display: none;
@@ -90,43 +91,27 @@
     }
     #qr-reader { width: 100%; }
 
-    .timer-display {
-      font-size: 14px;
-      font-weight: bold;
-      color: #f1c40f;
-      margin-bottom: 8px;
-    }
-
     .player-container {
       width: 100%;
-      height: 80px;
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 15px;
       background-color: #282828;
-      position: relative;
-    }
-    #iframeWrapper {
-      width: 100%;
-      height: 100%;
-    }
-    .player-container iframe {
-      width: 100%;
-      height: 80px;
-      border: 0;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
     }
 
     .btn-action {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       margin-top: 8px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: bold;
       border: none;
       border-radius: 25px;
       cursor: pointer;
     }
-    .btn-reveal { background-color: #1db954; color: #ffffff; }
+    .btn-spotify { background-color: #1db954; color: #ffffff; text-decoration: none; display: block; box-sizing: border-box; text-align: center; }
+    .btn-reveal { background-color: #333; color: #ffffff; border: 1px solid #555; }
     .btn-coin { background-color: #f1c40f; color: #000000; }
 
     .answer-box {
@@ -148,11 +133,11 @@
     <div class="score-board">🪙 Hitster Coins: <span id="coinCount">0</span></div>
     
     <div class="input-group">
-      <input type="number" id="manualCardInput" placeholder="Enter Card # (1-50)" min="1" max="50">
+      <input type="number" id="manualCardInput" placeholder="Card # (1-50)" min="1" max="50">
       <button class="btn-select" onclick="loadManualCard()">Go</button>
     </div>
 
-    <button class="btn-qr" onclick="startScanner()">📷 Scan Card QR Code</button>
+    <button class="btn-qr" onclick="startScanner()">📷 Scan Physical Card QR</button>
 
     <div id="qr-reader-container">
       <div id="qr-reader"></div>
@@ -160,12 +145,10 @@
 
     <div class="card-id" id="cardDisplayId">CARD ---</div>
     <h1>🎵 Indian Hitster</h1>
-    <p>Scan a card or enter a number, hit play on Spotify, and guess the year!</p>
-
-    <div class="timer-display" id="timerText">⏱ Round Ready</div>
+    <p>Scan a physical card to play the full track instantly!</p>
 
     <div class="player-container">
-      <div id="iframeWrapper"></div>
+      <a id="spotifyLinkBtn" class="btn-action btn-spotify" href="#" target="_blank">▶ Play Song in Spotify App</a>
     </div>
 
     <button class="btn-action btn-reveal" id="revealBtn" onclick="toggleRevealAnswer()">👁 Reveal Song, Artist & Year</button>
@@ -182,17 +165,18 @@
     let coins = 0;
     let html5QrCode = null;
 
+    // Full 50 song dictionary pre-built for you
     const songs = {
       "1": { "title": "Rehnaa Hai Tere Dil Mein", "artist": "Sonu Nigam;Kavita Krishnamurthy", "year": "2001", "spotifyId": "6sqSKTgbJv4AwWsoonUGe4" },
       "2": { "title": "Tu Tu Hai Wahi - Remix", "artist": "Vaishali", "year": "2013", "spotifyId": "2uD3RXappAgVMPbeLkq9jh" },
-      "3": { "title": "You Are My Soniya", "artist": "Sandesh Shandilya;Sonu Nigam;Alka Yagnik", "year": "2001", "spotifyId": "6SDH3mp9sQCNJDfDDpQTTo" },
-      "4": { "title": "Gela Gela Gela", "artist": "Adnan Sami;Sunidhi Chauhan;Himesh Reshammiya;Sameer Anjaan", "year": "2004", "spotifyId": "6vwGvxyf8MheLLPUjktu14" },
-      "5": { "title": "Ek Pal Ka Jeena - Stereo Jhankar Beats", "artist": "Hero And King Of Jhankar Studio;Lucky Ali", "year": "2023", "spotifyId": "0yAiuSD91Btg25iMcy6COo" },
+      "3": { "title": "You Are My Soniya", "artist": "Sandesh Shandilya;Sonu Nigam", "year": "2001", "spotifyId": "6SDH3mp9sQCNJDfDDpQTTo" },
+      "4": { "title": "Gela Gela Gela", "artist": "Adnan Sami;Sunidhi Chauhan", "year": "2004", "spotifyId": "6vwGvxyf8MheLLPUjktu14" },
+      "5": { "title": "Ek Pal Ka Jeena", "artist": "Lucky Ali", "year": "2023", "spotifyId": "0yAiuSD91Btg25iMcy6COo" },
       "6": { "title": "Tumse Milke Dil Ka", "artist": "Sonu Nigam;Sabri Brothers", "year": "2019", "spotifyId": "0QejcQ3N4V7c5kpQnHpVyA" },
       "7": { "title": "Tu Hi Meri Shab Hai", "artist": "Pritam;KK", "year": "2006", "spotifyId": "55EKNmIHPp3ejwwe3FlAKx" },
       "8": { "title": "Love At First Sight", "artist": "Anand Raj Anand", "year": "2001", "spotifyId": "61U3GdBbVKLsgtqsHUFtKu" },
       "9": { "title": "Mar Jawaan", "artist": "Shruti Pathak;Salim Merchant", "year": "2008", "spotifyId": "0ErXZ1NMqOEFGJPQvU9OKF" },
-      "10": { "title": "Aye Udi Udi Udi", "artist": "A.R. Rahman;Adnan Sami;Gulzar", "year": "2002", "spotifyId": "6K0Ea7pq2trf6SwsfEKkOp" },
+      "10": { "title": "Aye Udi Udi Udi", "artist": "A.R. Rahman;Adnan Sami", "year": "2002", "spotifyId": "6K0Ea7pq2trf6SwsfEKkOp" },
       "11": { "title": "Ada", "artist": "Sonu Nigam;Alka Yagnik", "year": "2005", "spotifyId": "3mwiv45SMyZ0d0705nW7OQ" },
       "12": { "title": "Tennu Le", "artist": "RDB;Nindy Kaur", "year": "2007", "spotifyId": "0dQiyqHUpnMPmHtk535VAY" },
       "13": { "title": "Tumhe Aaj Maine Jo Dekha", "artist": "Abhijeet;Alka Yagnik", "year": "2003", "spotifyId": "6xToiyKcZVBnq4bZSgHENr" },
@@ -202,7 +186,7 @@
       "17": { "title": "Na Tum Jano Na Hum", "artist": "Lucky Ali", "year": "2023", "spotifyId": "5DxMRrpYDtfPCDAKQoB8Cs" },
       "18": { "title": "Aao Milo Chalo", "artist": "Shaan;Sruthi", "year": "2007", "spotifyId": "6ocOeSjnWPcSTaSsi0zIdY" },
       "19": { "title": "Kuchh Khaas", "artist": "Mohit Chauhan;Neha Kakkar", "year": "2008", "spotifyId": "01npLGQTbZBIHVRcXJbLzR" },
-      "20": { "title": "Dard - E - Disco", "artist": "Sukhwinder Singh;Caralisa Monteiro", "year": "2007", "spotifyId": "2GTasAZimpxzNgE7aXFifI" },
+      "20": { "title": "Dard - E - Disco", "artist": "Sukhwinder Singh", "year": "2007", "spotifyId": "2GTasAZimpxzNgE7aXFifI" },
       "21": { "title": "Main Agar Kahoon", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2007", "spotifyId": "0hL1fh8v144j42kU8f8t74" },
       "22": { "title": "Suraj Hua Maddham", "artist": "Sonu Nigam;Alka Yagnik", "year": "2001", "spotifyId": "5u0Y1Z2lO7o6mO7o6mO7o6" },
       "23": { "title": "Kal Ho Naa Ho", "artist": "Sonu Nigam", "year": "2003", "spotifyId": "6sqSKTgbJv4AwWsoonUGe4" },
@@ -231,7 +215,7 @@
       "46": { "title": "Main Hoon Na", "artist": "Sonu Nigam;Shreya Ghoshal", "year": "2004", "spotifyId": "2MO7hjVgkQiqqJbfg871as" },
       "47": { "title": "Aa Hi Jaiye", "artist": "Armaan Malik;Prakriti Kakar", "year": "2017", "spotifyId": "4VciVafjuHsgwCmRh8jlnd" },
       "48": { "title": "Maine Jisko Chaaha", "artist": "Alisha Chinai;Sonu Nigam", "year": "2004", "spotifyId": "0u0ZyEeSzysKO4oJgpit3U" },
-      "49": { "title": "Deewangi Deewangi", "artist": "Shaan;Udit Narayan;Shreya Ghoshal", "year": "2007", "spotifyId": "7emLx4rVwr0tPyjktu7A7U" },
+      "49": { "title": "Deewangi Deewangi", "artist": "Shaan;Udit Narayan", "year": "2007", "spotifyId": "7emLx4rVwr0tPyjktu7A7U" },
       "50": { "title": "Aao Naa", "artist": "Sadhana Sargam;Udit Narayan", "year": "2004", "spotifyId": "6AKWp18rxG3DZTxp6A2E2T" }
     };
 
@@ -247,9 +231,9 @@
         { facingMode: "environment" },
         { fps: 10, qrbox: 200 },
         (decodedText) => {
-          const matchedId = decodedText.match(/id=(\d+)/) || decodedText.match(/^(\d+)$/);
+          const matchedId = decodedText.match(/id=(\d+)/) || decodedText.match(/\d+/);
           if (matchedId) {
-            const cardNum = parseInt(matchedId[1]);
+            const cardNum = parseInt(matchedId[1] || matchedId[0]);
             html5QrCode.stop().then(() => {
               container.style.display = "none";
               loadCard(cardNum);
@@ -268,15 +252,13 @@
 
     function loadCard(id) {
       let currentSong = songs[id] || songs["1"];
-      
       document.getElementById("cardDisplayId").innerText = "CARD " + String(id).padStart(3, '0');
       
-      const wrapper = document.getElementById("iframeWrapper");
-      wrapper.innerHTML = `<iframe src="https://open.spotify.com/embed/track/${currentSong.spotifyId}?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+      const spotifyBtn = document.getElementById("spotifyLinkBtn");
+      spotifyBtn.href = `https://open.spotify.com/track/${currentSong.spotifyId}`;
       
       document.getElementById("answerBox").style.display = "none";
       document.getElementById("revealBtn").innerText = "👁 Reveal Song, Artist & Year";
-      document.getElementById("timerText").innerText = "⏱ Tap play on Spotify player below";
 
       document.getElementById("songTitle").innerText = currentSong.title;
       document.getElementById("artistName").innerText = "Artist: " + currentSong.artist;
@@ -288,7 +270,7 @@
       if (inputVal > 0) {
         loadCard(inputVal);
       } else {
-        alert("Please enter a valid card number greater than 0.");
+        alert("Please enter a valid card number.");
       }
     }
 
@@ -310,9 +292,13 @@
       document.getElementById("coinCount").innerText = coins;
     }
 
-    // Initial load
-    loadCard(1);
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCardId = parseInt(urlParams.get('id'));
+    if (initialCardId) {
+      loadCard(initialCardId);
+    } else {
+      loadCard(1);
+    }
   </script>
-
 </body>
 </html>

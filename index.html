@@ -249,10 +249,9 @@
     let coins = 0;
     let timerInterval = null;
     let timeLeft = 30;
-    let html5QrcodeScanner = null;
+    let html5QrCode = null;
     let isAudioStopped = false;
 
-    // Direct, exact mapping of all 50 tracks straight from your Exportify CSV file
     const songs = {
       "1": { "title": "Rehnaa Hai Tere Dil Mein", "artist": "Sonu Nigam;Kavita Krishnamurthy", "year": "2001", "spotifyId": "6sqSKTgbJv4AwWsoonUGe4" },
       "2": { "title": "Tu Tu Hai Wahi - Remix", "artist": "Vaishali", "year": "2013", "spotifyId": "2uD3RXappAgVMPbeLkq9jh" },
@@ -310,19 +309,33 @@
       const container = document.getElementById("qr-reader-container");
       container.style.display = "block";
 
-      if (!html5QrcodeScanner) {
-        html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 200 });
-        html5QrcodeScanner.render((decodedText) => {
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader");
+      }
+
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 200 },
+        (decodedText) => {
           const matchedId = decodedText.match(/id=(\d+)/) || decodedText.match(/^(\d+)$/);
           if (matchedId) {
-            loadCard(parseInt(matchedId[1]));
-            html5QrcodeScanner.clear();
-            container.style.display = "none";
-          } else {
-            alert("Scanned QR is not a valid card format!");
+            const cardNum = parseInt(matchedId[1]);
+            html5QrCode.stop().then(() => {
+              container.style.display = "none";
+              loadCard(cardNum);
+            }).catch(() => {
+              container.style.display = "none";
+              loadCard(cardNum);
+            });
           }
-        });
-      }
+        },
+        (errorMessage) => {
+          // Scanning frame misses can be ignored safely
+        }
+      ).catch(err => {
+        alert("Camera permission denied or unavailable.");
+        container.style.display = "none";
+      });
     }
 
     function startListening() {
@@ -386,7 +399,7 @@
       document.getElementById("cardDisplayId").innerText = "CARD " + String(id).padStart(3, '0');
       
       const wrapper = document.getElementById("iframeWrapper");
-      wrapper.innerHTML = `<iframe src="https://open.spotify.com/embed/track/${currentSong.spotifyId}?utm_source=generator&theme=0&t=30" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+      wrapper.innerHTML = `<iframe src="https://open.spotify.com/embed/track/${currentSong.spotifyId}?utm_source=generator&theme=0&t=30" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
       
       document.getElementById("answerBox").style.display = "none";
       document.getElementById("revealBtn").innerText = "👁 Reveal Song, Artist & Year";

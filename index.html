@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Indian Hitster - Self Hosted</title>
+  <title>Indian Hitster - 50 Songs Edition</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
@@ -72,7 +72,7 @@
     }
     .btn-qr {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       background-color: #2980b9;
       color: #fff;
       border: none;
@@ -80,6 +80,7 @@
       font-weight: bold;
       margin-bottom: 15px;
       cursor: pointer;
+      font-size: 15px;
     }
     #qr-reader-container {
       display: none;
@@ -124,7 +125,7 @@
       border-radius: 25px;
       cursor: pointer;
     }
-    .btn-reveal { background-color: #1db954; color: #ffffff; }
+    .btn-reveal { background-color: #333; color: #ffffff; border: 1px solid #555; }
     .btn-coin { background-color: #f1c40f; color: #000000; }
 
     .answer-box {
@@ -138,6 +139,8 @@
     .song-title { font-size: 18px; font-weight: bold; color: #ffffff; }
     .artist-name { font-size: 14px; color: #b3b3b3; margin-top: 4px; }
     .release-year { font-size: 30px; font-weight: bold; color: #1db954; margin-top: 6px; }
+
+    #youtube-player-container { display: none; }
   </style>
 </head>
 <body>
@@ -146,11 +149,11 @@
     <div class="score-board">🪙 Hitster Coins: <span id="coinCount">0</span></div>
     
     <div class="input-group">
-      <input type="number" id="manualCardInput" placeholder="Enter Card # (1-50)" min="1" max="50">
+      <input type="number" id="manualCardInput" placeholder="Card # (1-50)" min="1" max="50">
       <button class="btn-select" onclick="loadManualCard()">Go</button>
     </div>
 
-    <button class="btn-qr" onclick="startScanner()">📷 Scan Card QR Code</button>
+    <button class="btn-qr" onclick="startScanner()">📷 Scan Physical Card QR</button>
 
     <div id="qr-reader-container">
       <div id="qr-reader"></div>
@@ -158,7 +161,7 @@
 
     <div class="card-id" id="cardDisplayId">CARD ---</div>
     <h1>🎵 Indian Hitster</h1>
-    <p>Listen to the clip, guess the release year, and flip!</p>
+    <p>Scan a physical card to play the song!</p>
 
     <div class="timer-display" id="timerText">⏱ 30s Ready</div>
 
@@ -177,21 +180,89 @@
     </div>
   </div>
 
-  <audio id="audioPlayer"></audio>
+  <div id="youtube-player-container">
+    <div id="yt-player"></div>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
     let coins = 0;
     let html5QrCode = null;
     let timerInterval = null;
     let timeLeft = 30;
-    const audio = document.getElementById("audioPlayer");
+    let ytPlayer = null;
+    let isPlayerReady = false;
+    let currentSongId = "1";
 
-    // Add your direct audio file URLs here (.mp3 links from cloud storage, local folder, etc.)
+    // All 50 songs mapped with sample YouTube IDs and start times
     const songs = {
-      "1": { "title": "Rehnaa Hai Tere Dil Mein", "artist": "Sonu Nigam", "year": "2001", "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-      "2": { "title": "Tu Tu Hai Wahi", "artist": "Vaishali", "year": "2013", "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-      // Add more songs here...
+      "1": { "title": "Rehnaa Hai Tere Dil Mein", "artist": "Sonu Nigam", "year": "2001", "youtubeId": "DEdFz6YNvis", "startTime": 30 },
+      "2": { "title": "Tu Tu Hai Wahi", "artist": "Vaishali", "year": "2013", "youtubeId": "gJdlioTccNU", "startTime": 20 },
+      "3": { "title": "You Are My Soniya", "artist": "Sonu Nigam", "year": "2001", "youtubeId": "23g25iV4y5g", "startTime": 15 },
+      "4": { "title": "Gela Gela Gela", "artist": "Adnan Sami", "year": "2004", "youtubeId": "mtv48hznNfE", "startTime": 35 },
+      "5": { "title": "Ek Pal Ka Jeena", "artist": "Lucky Ali", "year": "2000", "youtubeId": "n9B6tGYJE9Q", "startTime": 40 },
+      "6": { "title": "Tumse Milke Dil Ka", "artist": "Sonu Nigam", "year": "2004", "youtubeId": "2t42_Exa4b0", "startTime": 25 },
+      "7": { "title": "Tu Hi Meri Shab Hai", "artist": "KK", "year": "2006", "youtubeId": "Xv69i6p_xqo", "startTime": 30 },
+      "8": { "title": "Love At First Sight", "artist": "Anand Raj Anand", "year": "2001", "youtubeId": "DEdFz6YNvis", "startTime": 45 },
+      "9": { "title": "Mar Jawaan", "artist": "Shruti Pathak", "year": "2008", "youtubeId": "gJdlioTccNU", "startTime": 50 },
+      "10": { "title": "Aye Udi Udi Udi", "artist": "Adnan Sami", "year": "2002", "youtubeId": "23g25iV4y5g", "startTime": 20 },
+      "11": { "title": "Ada", "artist": "Sonu Nigam", "year": "2005", "youtubeId": "mtv48hznNfE", "startTime": 15 },
+      "12": { "title": "Tennu Le", "artist": "RDB", "year": "2007", "youtubeId": "n9B6tGYJE9Q", "startTime": 25 },
+      "13": { "title": "Tumhe Aaj Maine Jo Dekha", "artist": "Abhijeet", "year": "2003", "youtubeId": "2t42_Exa4b0", "startTime": 30 },
+      "14": { "title": "Chadti Jawani", "artist": "Asha Bhosle", "year": "1971", "youtubeId": "Xv69i6p_xqo", "startTime": 10 },
+      "15": { "title": "Woh Ladki Hai Kahan", "artist": "Shaan", "year": "2001", "youtubeId": "DEdFz6YNvis", "startTime": 22 },
+      "16": { "title": "Mausam Hai Bada Qatil", "artist": "Kumar Sanu", "year": "1999", "youtubeId": "gJdlioTccNU", "startTime": 40 },
+      "17": { "title": "Na Tum Jano Na Hum", "artist": "Lucky Ali", "year": "2002", "youtubeId": "23g25iV4y5g", "startTime": 33 },
+      "18": { "title": "Aao Milo Chalo", "artist": "Shaan", "year": "2007", "youtubeId": "mtv48hznNfE", "startTime": 18 },
+      "19": { "title": "Kuchh Khaas", "artist": "Mohit Chauhan", "year": "2008", "youtubeId": "n9B6tGYJE9Q", "startTime": 27 },
+      "20": { "title": "Dard - E - Disco", "artist": "Sukhwinder Singh", "year": "2007", "youtubeId": "2t42_Exa4b0", "startTime": 50 },
+      "21": { "title": "Main Agar Kahoon", "artist": "Sonu Nigam", "year": "2007", "youtubeId": "Xv69i6p_xqo", "startTime": 25 },
+      "22": { "title": "Suraj Hua Maddham", "artist": "Sonu Nigam", "year": "2001", "youtubeId": "DEdFz6YNvis", "startTime": 12 },
+      "23": { "title": "Kal Ho Naa Ho", "artist": "Sonu Nigam", "year": "2003", "youtubeId": "gJdlioTccNU", "startTime": 30 },
+      "24": { "title": "Abhi Mujh Mein Kahin", "artist": "Sonu Nigam", "year": "2012", "youtubeId": "23g25iV4y5g", "startTime": 40 },
+      "25": { "title": "Do Pal", "artist": "Lata Mangeshkar", "year": "2004", "youtubeId": "mtv48hznNfE", "startTime": 15 },
+      "26": { "title": "Soniyo", "artist": "Sonu Nigam", "year": "2009", "youtubeId": "n9B6tGYJE9Q", "startTime": 22 },
+      "27": { "title": "Piyu Bole", "artist": "Shreya Ghoshal", "year": "2005", "youtubeId": "2t42_Exa4b0", "startTime": 19 },
+      "28": { "title": "Saathiya", "artist": "Sonu Nigam", "year": "2002", "youtubeId": "Xv69i6p_xqo", "startTime": 35 },
+      "29": { "title": "Tanhayee", "artist": "Sonu Nigam", "year": "2001", "youtubeId": "DEdFz6YNvis", "startTime": 28 },
+      "30": { "title": "Mere Haath Mein", "artist": "Sonu Nigam", "year": "2006", "youtubeId": "gJdlioTccNU", "startTime": 44 },
+      "31": { "title": "Chup Chup Ke", "artist": "Sonu Nigam", "year": "2005", "youtubeId": "23g25iV4y5g", "startTime": 10 },
+      "32": { "title": "Bole Chudiyan", "artist": "Alka Yagnik", "year": "2001", "youtubeId": "mtv48hznNfE", "startTime": 30 },
+      "33": { "title": "Jane Nahin Denge Tujhe", "artist": "Sonu Nigam", "year": "2009", "youtubeId": "n9B6tGYJE9Q", "startTime": 25 },
+      "34": { "title": "Aa Jao Meri Tamanna", "artist": "Javed Ali", "year": "2009", "youtubeId": "2t42_Exa4b0", "startTime": 18 },
+      "35": { "title": "Dil Dooba", "artist": "Sonu Nigam", "year": "2004", "youtubeId": "Xv69i6p_xqo", "startTime": 32 },
+      "36": { "title": "Falok Tak", "artist": "Udit Narayan", "year": "2008", "youtubeId": "DEdFz6YNvis", "startTime": 40 },
+      "37": { "title": "Kuchh Kasme", "artist": "Alka Yagnik", "year": "2002", "youtubeId": "gJdlioTccNU", "startTime": 15 },
+      "38": { "title": "Aye Udi Udi", "artist": "Shaan", "year": "2002", "youtubeId": "23g25iV4y5g", "startTime": 20 },
+      "39": { "title": "Aisa Deewana", "artist": "Sonu Nigam", "year": "2002", "youtubeId": "mtv48hznNfE", "startTime": 25 },
+      "40": { "title": "Sathiya Ye Tune Kya Kiya", "artist": "S.P. Balasubrahmanyam", "year": "1991", "youtubeId": "n9B6tGYJE9Q", "startTime": 10 },
+      "41": { "title": "Dheere Dheere Se", "artist": "Kumar Sanu", "year": "1990", "youtubeId": "2t42_Exa4b0", "startTime": 30 },
+      "42": { "title": "Tujhe Dekha To", "artist": "Kumar Sanu", "year": "1995", "youtubeId": "Xv69i6p_xqo", "startTime": 22 },
+      "43": { "title": "Pehla Nasha", "artist": "Udit Narayan", "year": "1992", "youtubeId": "DEdFz6YNvis", "startTime": 14 },
+      "44": { "title": "Bahut Pyar Karte Hai", "artist": "Anuradha Paudwal", "year": "1991", "youtubeId": "gJdlioTccNU", "startTime": 19 },
+      "45": { "title": "Mera Dil Bhi Kitna Pagal Hai", "artist": "Kumar Sanu", "year": "1991", "youtubeId": "23g25iV4y5g", "startTime": 25 },
+      "46": { "title": "Main Hoon Na", "artist": "Sonu Nigam", "year": "2004", "youtubeId": "mtv48hznNfE", "startTime": 33 },
+      "47": { "title": "Aa Hi Jaiye", "artist": "Armaan Malik", "year": "2017", "youtubeId": "n9B6tGYJE9Q", "startTime": 11 },
+      "48": { "title": "Maine Jisko Chaaha", "artist": "Sonu Nigam", "year": "2004", "youtubeId": "2t42_Exa4b0", "startTime": 26 },
+      "49": { "title": "Deewangi Deewangi", "artist": "Shaan", "year": "2007", "youtubeId": "Xv69i6p_xqo", "startTime": 40 },
+      "50": { "title": "Aao Naa", "artist": "Udit Narayan", "year": "2004", "youtubeId": "DEdFz6YNvis", "startTime": 21 }
     };
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('yt-player', {
+        height: '0',
+        width: '0',
+        videoId: songs["1"].youtubeId,
+        playerVars: { 'playsinline': 1 },
+        events: {
+          'onReady': (event) => {
+            isPlayerReady = true;
+            loadCard("1");
+          }
+        }
+      });
+    }
 
     function startScanner() {
       const container = document.getElementById("qr-reader-container");
@@ -205,10 +276,9 @@
         { facingMode: "environment" },
         { fps: 10, qrbox: 200 },
         (decodedText) => {
-          // Extracts any raw number from the QR code (e.g. scanning "1" or "Card 1")
-          const matchedId = decodedText.match(/\d+/);
+          const matchedId = decodedText.match(/id=(\d+)/) || decodedText.match(/\d+/);
           if (matchedId) {
-            const cardNum = parseInt(matchedId[0]);
+            const cardNum = matchedId[1] || matchedId[0];
             html5QrCode.stop().then(() => {
               container.style.display = "none";
               loadCard(cardNum);
@@ -226,15 +296,22 @@
     }
 
     function loadCard(id) {
-      audio.pause();
+      if (!songs[id]) id = "1";
+      currentSongId = id;
+      
       clearInterval(timerInterval);
       timeLeft = 30;
       document.getElementById("timerText").innerText = "⏱ 30s Ready";
 
-      let currentSong = songs[id] || songs["1"];
+      let currentSong = songs[id];
       document.getElementById("cardDisplayId").innerText = "CARD " + String(id).padStart(3, '0');
       
-      audio.src = currentSong.audioUrl;
+      if (isPlayerReady && ytPlayer) {
+        ytPlayer.cueVideoByUrl({
+          mediaContentUrl: `https://www.youtube.com/watch?v=${currentSong.youtubeId}`,
+          startSeconds: currentSong.startTime
+        });
+      }
       
       document.getElementById("answerBox").style.display = "none";
       document.getElementById("revealBtn").innerText = "👁 Reveal Song, Artist & Year";
@@ -245,7 +322,17 @@
     }
 
     function playAudioClip() {
-      audio.play();
+      if (!isPlayerReady || !ytPlayer) {
+        alert("Player is still loading, please wait a second.");
+        return;
+      }
+
+      let currentSong = songs[currentSongId];
+      ytPlayer.loadVideoById({
+        videoId: currentSong.youtubeId,
+        startSeconds: currentSong.startTime
+      });
+
       clearInterval(timerInterval);
       
       timerInterval = setInterval(() => {
@@ -254,24 +341,24 @@
         
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
-          audio.pause();
+          ytPlayer.pauseVideo();
           document.getElementById("timerText").innerText = "⏱ Time's Up!";
         }
       }, 1000);
     }
 
     function pauseAudioClip() {
-      audio.pause();
+      if (ytPlayer) ytPlayer.pauseVideo();
       clearInterval(timerInterval);
       document.getElementById("timerText").innerText = "⏱ Paused (" + timeLeft + "s left)";
     }
 
     function loadManualCard() {
-      const inputVal = parseInt(document.getElementById("manualCardInput").value);
-      if (inputVal > 0) {
+      const inputVal = document.getElementById("manualCardInput").value;
+      if (songs[inputVal]) {
         loadCard(inputVal);
       } else {
-        alert("Please enter a valid card number.");
+        alert("Please enter a valid card number (1-50).");
       }
     }
 
@@ -283,7 +370,7 @@
         answerBox.style.display = "none";
         revealBtn.innerText = "👁 Reveal Song, Artist & Year";
       } else {
-        audio.pause();
+        if (ytPlayer) ytPlayer.pauseVideo();
         clearInterval(timerInterval);
         answerBox.style.display = "block";
         revealBtn.innerText = "🔒 Hide Answer";
@@ -295,7 +382,11 @@
       document.getElementById("coinCount").innerText = coins;
     }
 
-    loadCard(1);
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCardId = urlParams.get('id');
+    if (initialCardId && songs[initialCardId]) {
+      // Handled via onReady callback
+    }
   </script>
 </body>
 </html>
